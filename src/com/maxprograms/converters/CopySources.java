@@ -54,7 +54,7 @@ public class CopySources {
                 return;
             }
             if (arg.equals("-lang") && (i + 1) < arguments.length) {
-               Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
+                Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
             }
             if (arg.equals("-xliff") && (i + 1) < arguments.length) {
                 xliff = arguments[i + 1];
@@ -125,26 +125,26 @@ public class CopySources {
     }
 
     private static void recurse(Element root) throws IOException {
-        if (("xliff".equals(root.getName()) && version.startsWith("2.") && root.getAttributeValue("trgLang").isEmpty())
-                || ("file".equals(root.getName()) && version.startsWith("1.")
+        String name = root.getName();
+        if (("xliff".equals(name) && version.startsWith("2.") && root.getAttributeValue("trgLang").isEmpty())
+                || ("file".equals(name) && version.startsWith("1.")
                         && root.getAttributeValue("target-language").isEmpty())) {
             throw new IOException(Messages.getString("CopySources.4"));
         }
-        if (("file".equals(root.getName()) || "group".equals(root.getName()) || "trans-unit".equals(root.getName())
-                || "unit".equals(root.getName()))
-                && "no".equals(root.getAttributeValue("translate"))) {
+        if (("file".equals(name) || "group".equals(name) || "trans-unit".equals(name)
+                || "unit".equals(name)) && "no".equals(root.getAttributeValue("translate"))) {
             return;
         }
-        if (("trans-unit".equals(root.getName()) && root.getChild("seg-source") == null)
-                || "segment".equals(root.getName()) || "ignorable".equals(root.getName())) {
+        if (("trans-unit".equals(name) && root.getChild("seg-source") == null) || "segment".equals(name)
+                || "ignorable".equals(name)) {
             Element target = root.getChild("target");
-            if (target == null) {
+            if (target == null || target.getContent().isEmpty()) {
                 Element source = root.getChild("source");
                 target = translate(source);
                 if ("preserve".equals(source.getAttributeValue("xml:space"))) {
                     target.setAttribute("xml:space", "preserve");
                 }
-                if ("segment".equals(root.getName())) {
+                if ("segment".equals(name)) {
                     root.setAttribute("state", "translated");
                 }
                 List<XMLNode> newContent = new Vector<>();
