@@ -20,6 +20,7 @@ import com.maxprograms.xml.Element;
 import com.maxprograms.xml.PI;
 import com.maxprograms.xml.TextNode;
 import com.maxprograms.xml.XMLNode;
+import com.maxprograms.xml.XMLUtils;
 
 public class Xliff1xProcessor {
 
@@ -276,7 +277,7 @@ public class Xliff1xProcessor {
             sb.append(' ');
             sb.append(name);
             sb.append("=\"");
-            sb.append(a.getValue());
+            sb.append(XMLUtils.cleanText(a.getValue()));
             sb.append("\"");
         }
         sb.append(">");
