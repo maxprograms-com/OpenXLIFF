@@ -313,8 +313,15 @@ public class FromOpenXliff {
         }
         if ("unit".equals(root.getName()) && !root.getAttributeValue("translate").equals("no")) {
             Element sklMetadata = root.getChild("mda:metadata");
-            String id = root.getChildren("segment").get(0).getPI(Constants.TOOLID).get(0).getData();
-            Element xliffMetadata = unitMetadata.get(id);
+            Element xliffMetadata = null;
+            List<Element> children = root.getChildren("segment");
+            if (!children.isEmpty()) {
+                List<PI> toolId = children.get(0).getPI(Constants.TOOLID);
+                if (!toolId.isEmpty()) {
+                    String id = toolId.get(0).getData();
+                    xliffMetadata = unitMetadata.get(id);
+                }
+            }
             if (sklMetadata != null && xliffMetadata == null) {
                 root.removeChild(sklMetadata);
             } else if (sklMetadata == null && xliffMetadata != null) {
@@ -326,7 +333,6 @@ public class FromOpenXliff {
             } else if (sklMetadata != null && xliffMetadata != null) {
                 sklMetadata.clone(xliffMetadata);
             }
-            List<Element> children = root.getChildren("segment");
             Iterator<Element> it = children.iterator();
             while (it.hasNext()) {
                 Element seg = it.next();

@@ -73,9 +73,12 @@ public class Xliff2xProcessor {
                     return;
                 }
                 unit.addContent(source);
-                Element target = new Element("target");
-                target.setContent(getContent2x(segment.getChild("target"), false));
-                unit.addContent(target);
+                List<XMLNode> targetContent = getContent2x(segment.getChild("target"), false);
+                if (!targetContent.isEmpty()) {
+                    Element target = new Element("target");
+                    target.setContent(targetContent);
+                    unit.addContent(target);
+                }                
                 if (segments.size() == 1) {
                     Element notes = root.getChild("notes");
                     if (notes != null) {
