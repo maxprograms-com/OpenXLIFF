@@ -24,7 +24,7 @@ You can find the XLIFF an TMX files for Spanish in `/i18n` folder.
 
 OpenXLIFF Filters depends on these related projects:
 
-- [BCP47J](https://github.com/rmraya/BCP47J) for language tags
-- [XMLJava](https://github.com/rmraya/XMLJava) for XML parsing
+- [BCP47J](https://github.com/maxprograms-com/BCP47J) for language tags
+- [XMLJava](https://github.com/maxprograms-com/XMLJava) for XML parsing
 
 You may need to localize these projects as well.

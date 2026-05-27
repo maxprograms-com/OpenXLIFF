@@ -4,8 +4,8 @@ OpenXLIFF Filters uses these libraries:
 
 ## BCP47J
 
-- Available from <https://github.com/rmraya/BCP47J>
-- Published under [Custom License](https://github.com/rmraya/BCP47J/blob/main/LICENSE.md)
+- Available from <https://github.com/maxprograms-com/BCP47J>
+- Published under [Custom License](https://github.com/maxprograms-com/BCP47J/blob/main/LICENSE.md)
 
 ## JSON-java
 
@@ -19,5 +19,5 @@ OpenXLIFF Filters uses these libraries:
 
 ## XMLJava
 
-- Available from <https://github.com/rmraya/XMLJava>
-- Published under [Custom License](https://github.com/rmraya/XMLJava/blob/main/LICENSE.md)
+- Available from <https://github.com/maxprograms-com/XMLJava>
+- Published under [Custom License](https://github.com/maxprograms-com/XMLJava/blob/main/LICENSE.md)
