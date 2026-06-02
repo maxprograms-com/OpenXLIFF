@@ -148,5 +148,29 @@
 	<uri name="http://schemas.microsoft.com/office/spreadsheetml/2025/externalCodeService2" uri="MS-XLSX-AppendixA/5_44_spreadsheetml_2025_externalCodeService2.xsd" />
 	<!-- section 5.45 -->
 	<uri name="http://schemas.microsoft.com/office/spreadsheetml/2025/pivotDataSource" uri="MS-XLSX-AppendixA/5_45_spreadsheetml_2025_pivotDataSource.xsd" />
-</catalog>
 
+	<!-- MS-XLSX Appendix A imported dependency schemas -->
+	<system systemId="oartdocprop.xsd" uri="xlsx/oartdocprop.xsd" />
+	<system systemId="orel.xsd" uri="xlsx/orel.xsd" />
+	<system systemId="xl14.xsd" uri="xlsx/xl14.xsd" />
+	<system systemId="xl15.xsd" uri="xlsx/xl15.xsd" />
+	<system systemId="xlautofilter.xsd" uri="xlsx/xlautofilter.xsd" />
+	<system systemId="xlbasictypes.xsd" uri="xlsx/xlbasictypes.xsd" />
+	<system systemId="xlextconns.xsd" uri="xlsx/xlextconns.xsd" />
+	<system systemId="xlmbasictypes.xsd" uri="xlsx/xlmbasictypes.xsd" />
+	<system systemId="xlpivot.xsd" uri="xlsx/xlpivot.xsd" />
+	<system systemId="xlpivot16.xsd" uri="xlsx/xlpivot16.xsd" />
+	<system systemId="xlrevexignore.xsd" uri="xlsx/xlrevexignore.xsd" />
+	<system systemId="xlrevexignore10.xsd" uri="xlsx/xlrevexignore10.xsd" />
+	<system systemId="xlrevexignore2.xsd" uri="xlsx/xlrevexignore2.xsd" />
+	<system systemId="xlrevexignore6.xsd" uri="xlsx/xlrevexignore6.xsd" />
+	<system systemId="xlrichvaluerefresh.xsd" uri="xlsx/xlrichvaluerefresh.xsd" />
+	<system systemId="xlsheet.xsd" uri="xlsx/xlsheet.xsd" />
+	<system systemId="xlslicercache.xsd" uri="xlsx/xlslicercache.xsd" />
+	<system systemId="xlslicercache15.xsd" uri="xlsx/xlslicercache15.xsd" />
+	<system systemId="xlsst.xsd" uri="xlsx/xlsst.xsd" />
+	<system systemId="xlstyles.xsd" uri="xlsx/xlstyles.xsd" />
+	<system systemId="xlsupbook.xsd" uri="xlsx/xlsupbook.xsd" />
+	<system systemId="xlThreadedComments2.xsd" uri="xlsx/xlThreadedComments2.xsd" />
+	<system systemId="xlworkbook.xsd" uri="xlsx/xlworkbook.xsd" />
+</catalog>
