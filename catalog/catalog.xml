@@ -86,11 +86,11 @@
 	<public publicId="-//W3C//DTD XHTML 1.0 Transitional//EN" uri="xhtml1.0/xhtml1-transitional.dtd" />
 	<system systemId="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd" uri="xhtml1.0/xhtml1-transitional.dtd" />
 
-	<public publicId="-//W3C//DTD XHTML 1.1//EN" uri="xhtml1.1/xhtml11-flat.dtd" />
+	<public publicId="-//W3C//DTD XHTML 1.1//EN" uri="xhtml1.1/xhtml11.xsd" />
 	<public publicId="-//W3C//ENTITIES XHTML 1.1 Document Model 1.0//EN" uri="xhtml1.1/xhtml11-model-1.mod" />
 	<public publicId="-//W3C//ENTITIES XHTML Inline Style 1.0//EN" uri="xhtml1.1/xhtml11-model-1.mod" />
 	<system systemId="http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-inlstyle-1.mod" uri="xhtml1.1/xhtml11-model-1.mod" />
-	<uri name="http://www.w3.org/1999/xhtml" uri="xhtml1.1/xhtml11-flat.dtd" />
+	<uri name="http://www.w3.org/1999/xhtml" uri="xhtml1.1/xhtml11.xsd" />
 	<system systemId="xhtml11.dtd" uri="xhtml1.1/xhtml11-flat.dtd" />
 	<public publicId="-//W3C//ENTITIES XHTML Modular Framework 1.0//EN" uri="xhtml1.1/xhtml-framework-1.mod" />
 	<uri name="http://www.w3.org/MarkUp/DTD/xhtml-framework-1.mod" uri="xhtml1.1/xhtml-framework-1.mod" />
