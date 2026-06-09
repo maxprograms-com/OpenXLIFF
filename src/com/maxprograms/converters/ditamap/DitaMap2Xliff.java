@@ -112,24 +112,6 @@ public class DitaMap2Xliff {
 			Catalog catalog = CatalogBuilder.getCatalog(params.get("catalog"));
 			String mapFile = params.get("source");
 
-			// Parse maxThreads parameter early to pass to DitaParser
-			String maxThreadsParam = params.get("maxThreads");
-			int maxThreads;
-			if (maxThreadsParam != null) {
-				try {
-					maxThreads = Integer.parseInt(maxThreadsParam);
-					if (maxThreads < 1) {
-						maxThreads = 1;
-					}
-				} catch (NumberFormatException e) {
-					// Use default if invalid
-					maxThreads = Runtime.getRuntime().availableProcessors();
-				}
-			} else {
-				maxThreads = Runtime.getRuntime().availableProcessors();
-			}
-			params.put("maxThreads", String.valueOf(maxThreads));
-
 			DitaParser parser = new DitaParser();
 			if (dataLogger != null) {
 				if (dataLogger.isCancelled()) {
@@ -285,10 +267,7 @@ public class DitaMap2Xliff {
 			Catalog catalog, String skeleton) {
 		List<ProcessingResult> results = new Vector<>();
 
-		String maxThreadsParam = params.get("maxThreads");
-		int maxThreads = Integer.parseInt(maxThreadsParam);
-
-		try (ExecutorService executor = Executors.newFixedThreadPool(maxThreads)) {
+		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
 			List<Future<ProcessingResult>> futures = new ArrayList<>();
 
 			for (String file : filesMap) {

@@ -79,7 +79,6 @@ public class Merge {
 		String xliff = "";
 		String target = "";
 		String catalog = "";
-		String maxThreads = "";
 		boolean unapproved = false;
 		boolean exportTMX = false;
 		boolean getTarget = false;
@@ -116,9 +115,6 @@ public class Merge {
 			}
 			if (arg.equals("-lang") && (i + 1) < arguments.length) {
 				Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
-			}
-			if (arg.equals("-maxThreads") && (i + 1) < arguments.length) {
-				maxThreads = arguments[i + 1];
 			}
 		}
 		if (arguments.length < 2) {
@@ -181,7 +177,7 @@ public class Merge {
 		if (!catalogFile.isAbsolute()) {
 			catalog = catalogFile.getAbsoluteFile().getAbsolutePath();
 		}
-		List<String> result = merge(xliff, target, catalog, unapproved, maxThreads);
+		List<String> result = merge(xliff, target, catalog, unapproved);
 		if (exportTMX && Constants.SUCCESS.equals(result.get(0))) {
 			String tmx = "";
 			if (xliff.toLowerCase().endsWith(".xlf")) {
@@ -197,7 +193,7 @@ public class Merge {
 		}
 	}
 
-	public static List<String> merge(String xliff, String target, String catalog, boolean acceptUnaproved, String maxThreads) {
+	public static List<String> merge(String xliff, String target, String catalog, boolean acceptUnaproved) {
 		List<String> result = new ArrayList<>();
 		try {
 			loadXliff(xliff, catalog);
@@ -267,9 +263,6 @@ public class Merge {
 				params.put("encoding", encoding);
 				params.put("catalog", catalog);
 				params.put("format", pair[1]);
-				if (!maxThreads.isEmpty()) {
-					params.put("maxThreads", maxThreads);
-				}
 				paramsList.add(params);
 			}
 			for (int i = 0; i < paramsList.size(); i++) {
