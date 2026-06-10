@@ -162,7 +162,7 @@ public class ScopeBuilder {
 								logger.log(Level.WARNING, issue);
 								issues.add(issue);
 							}
-						} catch (IOException ioe) {
+						} catch (IOException _) {
 							// ignore files that can't be parsed
 						}
 					}

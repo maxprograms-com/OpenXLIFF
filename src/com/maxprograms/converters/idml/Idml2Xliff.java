@@ -215,20 +215,20 @@ public class Idml2Xliff {
 
 		// Parse maxThreads parameter
 		String maxThreadsParam = params.get("maxThreads");
-			int maxThreads;
-			if (maxThreadsParam != null) {
-				try {
-					maxThreads = Integer.parseInt(maxThreadsParam);
-					if (maxThreads < 1) {
-						maxThreads = 1;
-					}
-				} catch (NumberFormatException e) {
-					// Use default if invalid
-					maxThreads = Runtime.getRuntime().availableProcessors();
+		int maxThreads;
+		if (maxThreadsParam != null) {
+			try {
+				maxThreads = Integer.parseInt(maxThreadsParam);
+				if (maxThreads < 1) {
+					maxThreads = 1;
 				}
-			} else {
+			} catch (NumberFormatException _) {
+				// Use default if invalid
 				maxThreads = Runtime.getRuntime().availableProcessors();
 			}
+		} else {
+			maxThreads = Runtime.getRuntime().availableProcessors();
+		}
 		params.put("maxThreads", String.valueOf(maxThreads));
 
 		List<String> entryOrder = new Vector<>();
@@ -251,7 +251,7 @@ public class Idml2Xliff {
 				while ((entry = in.getNextEntry()) != null) {
 					String entryName = entry.getName();
 					entryOrder.add(entryName);
-					
+
 					File tmp = File.createTempFile("idml", ".tmp", new File(skeleton).getParentFile());
 					try (FileOutputStream output = new FileOutputStream(tmp.getAbsolutePath())) {
 						byte[] buf = new byte[1024];
@@ -283,7 +283,7 @@ public class Idml2Xliff {
 			}
 
 			results = processStoriesInParallel(storiesToProcess, params, maxThreads);
-			
+
 			// Index results by entry name for quick lookup
 			Map<String, StoryResult> resultMap = new Hashtable<>();
 			for (StoryResult storyResult : results) {
@@ -346,7 +346,7 @@ public class Idml2Xliff {
 			logger.log(Level.ERROR, Messages.getString("Idml2Xliff.1"), e);
 			result.add(Constants.ERROR);
 			result.add(e.getMessage());
-			
+
 			// Close ZipOutputStream if it was opened
 			if (out != null) {
 				try {
@@ -355,7 +355,7 @@ public class Idml2Xliff {
 					logger.log(Level.WARNING, Messages.getString("Idml2Xliff.2"), ioe);
 				}
 			}
-			
+
 			// Clean up all temporary files on error
 			for (StoryResult storyResult : results) {
 				try {
@@ -372,7 +372,7 @@ public class Idml2Xliff {
 					logger.log(Level.WARNING, Messages.getString("Idml2Xliff.3"), ioe);
 				}
 			}
-			
+
 			for (File tempFile : allEntries.values()) {
 				try {
 					if (tempFile != null && tempFile.exists()) {
@@ -402,6 +402,9 @@ public class Idml2Xliff {
 			for (Future<StoryResult> future : futures) {
 				try {
 					results.add(future.get());
+				} catch (InterruptedException _) {
+					Thread.currentThread().interrupt();
+					break;
 				} catch (Exception e) {
 					logger.log(Level.ERROR, "Error processing story in parallel", e);
 				}
@@ -473,7 +476,7 @@ public class Idml2Xliff {
 			if (skl.exists()) {
 				try {
 					Files.delete(Paths.get(skl.toURI()));
-				} catch (IOException ioe) {
+				} catch (IOException _) {
 					// ignore cleanup errors
 				}
 			}
@@ -481,7 +484,7 @@ public class Idml2Xliff {
 			if (xlf.exists()) {
 				try {
 					Files.delete(Paths.get(xlf.toURI()));
-				} catch (IOException ioe) {
+				} catch (IOException _) {
 					// ignore cleanup errors
 				}
 			}

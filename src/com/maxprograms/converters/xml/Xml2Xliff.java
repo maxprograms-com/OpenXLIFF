@@ -475,7 +475,7 @@ public class Xml2Xliff {
 			if (!root.isEmpty()) {
 				result = root;
 			}
-		} catch (Exception e) {
+		} catch (Exception _) {
 			// do nothing
 		}
 		return result;

@@ -325,7 +325,7 @@ public class SvgStats {
 						if (quality > max) {
 							max = quality;
 						}
-					} catch (NumberFormatException ex) {
+					} catch (NumberFormatException _) {
 						// ignore
 					}
 				}

@@ -126,7 +126,7 @@ public class Xliff2DitaMap {
 				if (maxThreads < 1) {
 					maxThreads = 1;
 				}
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException _) {
 				// Use default if invalid
 				maxThreads = Runtime.getRuntime().availableProcessors();
 			}
@@ -148,6 +148,9 @@ public class Xliff2DitaMap {
 			for (Future<ProcessingResult> future : futures) {
 				try {
 					results.add(future.get());
+				} catch (InterruptedException _) {
+					Thread.currentThread().interrupt();
+					break;
 				} catch (Exception e) {
 					logger.log(Level.ERROR, "Error processing file", e);
 					results.add(new ProcessingResult(e.getMessage()));

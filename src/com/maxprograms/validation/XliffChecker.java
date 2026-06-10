@@ -157,18 +157,18 @@ public class XliffChecker {
 		xliffNamespaces.add("urn:oasis:names:tc:xliff:document:1.2");
 	}
 
-	private String getCatalog(String version) {
+	private String getCatalog(String version) throws IOException {
 		String home = System.getenv("OpenXLIFF_HOME");
 		if (home == null) {
 			home = System.getProperty("user.dir");
 		}
 		File catalogFolder = new File(new File(home), "catalog");
 		if (!catalogFolder.exists()) {
-			logger.log(Level.ERROR, Messages.getString("XliffChecker.2"));
+			throw new IOException(Messages.getString("XliffChecker.2"));
 		}
 		File validationFolder = new File(catalogFolder, "validation");
 		if (!validationFolder.exists()) {
-			logger.log(Level.ERROR, Messages.getString("XliffChecker.3"));
+			throw new IOException(Messages.getString("XliffChecker.3"));
 		}
 
 		File catalog = null;
@@ -182,6 +182,9 @@ public class XliffChecker {
 			case "2.2":
 				catalog = new File(validationFolder, "validation22.xml");
 				break;
+		}
+		if (catalog == null) {
+			throw new IOException(Messages.getString("XliffChecker.10"));
 		}
 		return catalog.getAbsolutePath();
 	}

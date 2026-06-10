@@ -121,7 +121,7 @@ public class DitaMap2Xliff {
 					if (maxThreads < 1) {
 						maxThreads = 1;
 					}
-				} catch (NumberFormatException e) {
+				} catch (NumberFormatException _) {
 					// Use default if invalid
 					maxThreads = Runtime.getRuntime().availableProcessors();
 				}
@@ -167,7 +167,7 @@ public class DitaMap2Xliff {
 			}
 
 			List<ProcessingResult> results = convertInParallel(filesMap, params, catalog, skeleton);
-			
+
 			// Collect xliffs and skels from results
 			for (ProcessingResult fpr : results) {
 				if (fpr.skipped) {
@@ -302,6 +302,9 @@ public class DitaMap2Xliff {
 			for (Future<ProcessingResult> future : futures) {
 				try {
 					results.add(future.get());
+				} catch (InterruptedException _) {
+					Thread.currentThread().interrupt();
+					break;
 				} catch (Exception e) {
 					logger.log(Level.ERROR, "Error processing file", e);
 					results.add(new ProcessingResult(e.getMessage()));
@@ -499,7 +502,7 @@ public class DitaMap2Xliff {
 								root.setAttribute("removeTranslate", "yes");
 							}
 						}
-					} catch (SAXException | ParserConfigurationException | IOException ex) {
+					} catch (SAXException | ParserConfigurationException | IOException _) {
 						// do nothing
 					}
 				}
@@ -733,7 +736,7 @@ public class DitaMap2Xliff {
 						while (it.hasNext()) {
 							fixConKeyRef(it.next(), href, d, catalog, context);
 						}
-					} catch (Exception ex) {
+					} catch (Exception _) {
 						// do nothing
 					}
 				}

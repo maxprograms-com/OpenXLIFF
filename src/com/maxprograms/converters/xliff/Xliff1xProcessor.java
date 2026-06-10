@@ -138,7 +138,7 @@ public class Xliff1xProcessor {
                         try {
                             Integer.parseInt(note.getAttributeValue("priority"));
                             n.setAttribute("priority", note.getAttributeValue("priority"));
-                        } catch (NumberFormatException e) {
+                        } catch (NumberFormatException _) {
                             // ignore invalid priority
                         }
                     }

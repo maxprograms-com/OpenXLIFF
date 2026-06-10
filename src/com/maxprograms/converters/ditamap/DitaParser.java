@@ -177,103 +177,116 @@ public class DitaParser {
 		int maxThreads = Integer.parseInt(maxThreadsParam);
 
 		int count = 0;
-		ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
-		try {
-			do {
-				List<String> files = new ArrayList<>(pendingRecurse);
-				pendingRecurse.clear();
-				
-				List<java.util.concurrent.Future<?>> futures = files.stream()
-					.filter(file -> !recursed.contains(file))
-					.map(file -> executor.submit((Runnable) () -> {
-						// Use visiting as a semaphore to prevent concurrent processing of the same file
-						if (!visiting.add(file)) {
-							return; // Another thread is already processing this file
-						}
-						try {
-							if (dataLogger != null) {
-								if (dataLogger.isCancelled()) {
-									throw new IOException(Constants.CANCELLED);
-								}
-								synchronized (dataLogger) {
-									dataLogger.log(new File(file).getName());
-								}
-							}
-							SAXBuilder threadBuilder = new SAXBuilder();
-							threadBuilder.setEntityResolver(catalog);
-							threadBuilder.setErrorHandler(new SilentErrorHandler());
-							Element e = threadBuilder.build(file).getRootElement();
-							if ("svg".equals(e.getName())) {
-								if (containsText(e)) {
-									translatableSVG.add(file);
-								} else {
-									recursed.add(file);
-									return;
-								}
-							}
-							// Check if file has translate="no" attribute
-							if (e.getAttributeValue("translate", "yes").equals("no")) {
-								synchronized (ignored) {
-									ignored.add(file);
-								}
-								MessageFormat mf = new MessageFormat(Messages.getString("DitaParser.02"));
-								String issue = mf.format(new Object[] { file });
-								logger.log(Level.WARNING, issue);
-								synchronized (issues) {
-									if (!issues.contains(issue)) {
-										issues.add(issue);
-									}
-								}
-								recursed.add(file);
-								return;
-							}
-							recurse(e, file);
-							recursed.add(file);
-							filesMap.add(file);
-						} catch (IOException ex) {
-							if (Constants.CANCELLED.equals(ex.getMessage())) {
-								throw new RuntimeException(ex);
-							}
-							// ignore images and other IO errors
-						} catch (SAXException | ParserConfigurationException ex) {
-							// ignore images
-						} finally {
-							visiting.remove(file);
-						}
-				}))
-						.collect(Collectors.toList());
-				
-				// Wait for all tasks to complete
-				for (java.util.concurrent.Future<?> future : futures) {
-					try {
-						future.get();
-					} catch (java.util.concurrent.ExecutionException ex) {
-						if (ex.getCause() instanceof RuntimeException && 
-							ex.getCause().getCause() instanceof IOException &&
-							Constants.CANCELLED.equals(ex.getCause().getCause().getMessage())) {
-							throw new IOException(Constants.CANCELLED);
-						}
-					} catch (InterruptedException ex) {
-						Thread.currentThread().interrupt();
-						throw new IOException("File discovery interrupted", ex);
-					}
-				}
-				count++;
-			} while (!pendingRecurse.isEmpty() && count < 4);
-		} finally {
-			executor.shutdown();
+		try (ExecutorService executor = Executors.newFixedThreadPool(maxThreads)) {
 			try {
-				// Wait for tasks to complete, then force shutdown
-				if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-					executor.shutdownNow();
-					// Wait for forced shutdown to complete
-					if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-						logger.log(Level.WARNING, "DitaParser thread pool did not terminate");
+				do {
+					List<String> files = new ArrayList<>(pendingRecurse);
+					pendingRecurse.clear();
+
+					List<java.util.concurrent.Future<?>> futures = files.stream()
+							.filter(file -> !recursed.contains(file))
+							.map(file -> executor.submit((Runnable) () -> {
+								// Use visiting as a semaphore to prevent concurrent processing of the same file
+								if (!visiting.add(file)) {
+									return; // Another thread is already processing this file
+								}
+								try {
+									if (dataLogger != null) {
+										if (dataLogger.isCancelled()) {
+											throw new IOException(Constants.CANCELLED);
+										}
+										synchronized (dataLogger) {
+											dataLogger.log(new File(file).getName());
+										}
+									}
+									SAXBuilder threadBuilder = new SAXBuilder();
+									threadBuilder.setEntityResolver(catalog);
+									threadBuilder.setErrorHandler(new SilentErrorHandler());
+									Element e = threadBuilder.build(file).getRootElement();
+									if ("svg".equals(e.getName())) {
+										if (containsText(e)) {
+											translatableSVG.add(file);
+										} else {
+											recursed.add(file);
+											return;
+										}
+									}
+									// Check if file has translate="no" attribute
+									if (e.getAttributeValue("translate", "yes").equals("no")) {
+										synchronized (ignored) {
+											ignored.add(file);
+										}
+										MessageFormat mf = new MessageFormat(Messages.getString("DitaParser.02"));
+										String issue = mf.format(new Object[] { file });
+										logger.log(Level.WARNING, issue);
+										synchronized (issues) {
+											if (!issues.contains(issue)) {
+												issues.add(issue);
+											}
+										}
+										recursed.add(file);
+										return;
+									}
+									recurse(e, file);
+									recursed.add(file);
+									filesMap.add(file);
+								} catch (IOException ex) {
+									if (Constants.CANCELLED.equals(ex.getMessage())) {
+										throw new RuntimeException(ex);
+									}
+									// ignore images and other IO errors
+								} catch (SAXException | ParserConfigurationException ex) {
+									// ignore images
+									String extension = file.contains(".") ? file.substring(file.lastIndexOf('.')) : "";
+									List<String> ditaExtensions = List.of(".xml", ".dita", ".ditamap", ".svg");
+									if (ditaExtensions.contains(extension)) {
+										MessageFormat mf = new MessageFormat(Messages.getString("DitaParser.04"));
+										String issue = mf.format(new Object[] { file, ex.getMessage() });
+										logger.log(Level.WARNING, issue);
+										synchronized (issues) {
+											if (!issues.contains(issue)) {
+												issues.add(issue);
+											}
+										}
+									}
+								} finally {
+									visiting.remove(file);
+								}
+							}))
+							.collect(Collectors.toList());
+
+					// Wait for all tasks to complete
+					for (java.util.concurrent.Future<?> future : futures) {
+						try {
+							future.get();
+						} catch (java.util.concurrent.ExecutionException ex) {
+							if (ex.getCause() instanceof RuntimeException &&
+									ex.getCause().getCause() instanceof IOException &&
+									Constants.CANCELLED.equals(ex.getCause().getCause().getMessage())) {
+								throw new IOException(Constants.CANCELLED);
+							}
+						} catch (InterruptedException ex) {
+							Thread.currentThread().interrupt();
+							throw new IOException("File discovery interrupted", ex);
+						}
 					}
+					count++;
+				} while (!pendingRecurse.isEmpty() && count < 4);
+			} finally {
+				executor.shutdown();
+				try {
+					// Wait for tasks to complete, then force shutdown
+					if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+						executor.shutdownNow();
+						// Wait for forced shutdown to complete
+						if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
+							logger.log(Level.WARNING, "DitaParser thread pool did not terminate");
+						}
+					}
+				} catch (InterruptedException ex) {
+					executor.shutdownNow();
+					Thread.currentThread().interrupt();
 				}
-			} catch (InterruptedException ex) {
-				executor.shutdownNow();
-				Thread.currentThread().interrupt();
 			}
 		}
 		result.addAll(filesMap);

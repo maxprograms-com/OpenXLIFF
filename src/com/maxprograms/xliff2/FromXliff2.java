@@ -448,7 +448,7 @@ public class FromXliff2 {
 							float f = Float.parseFloat(quality);
 							int round = Math.round(f);
 							altTrans.setAttribute("match-quality", "" + round);
-						} catch (NumberFormatException ne) {
+						} catch (NumberFormatException _) {
 							// do nothing
 						}
 					}

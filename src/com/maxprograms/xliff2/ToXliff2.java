@@ -577,7 +577,7 @@ public class ToXliff2 {
 						try {
 							Float quality = Float.parseFloat(matchQuality);
 							match.setAttribute("matchQuality", "" + quality);
-						} catch (NumberFormatException nf) {
+						} catch (NumberFormatException _) {
 							// ignore
 						}
 					}

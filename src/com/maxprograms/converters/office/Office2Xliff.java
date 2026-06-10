@@ -154,7 +154,7 @@ public class Office2Xliff {
 									} else {
 										saveEntry(out, entry, tmp.getAbsolutePath());
 									}
-								} catch (IOException e) {
+								} catch (IOException _) {
 									// do nothing
 									saveEntry(out, entry, tmp.getAbsolutePath());
 								}

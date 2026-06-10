@@ -112,7 +112,7 @@ public class Xliff2json {
 
     private static String replaceUnicodeEntities(String text) {
         if (text == null || text.isEmpty()) {
-            return text;
+            return "";
         }
         Matcher matcher = Pattern.compile("\\\\u([0-9a-fA-F]{4})").matcher(text);
         StringBuilder result = new StringBuilder();

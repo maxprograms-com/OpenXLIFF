@@ -733,7 +733,7 @@ public class RepetitionAnalysis {
 				if (value > max) {
 					max = value;
 				}
-			} catch (Exception e1) {
+			} catch (Exception _) {
 				// do nothing here
 			}
 		}

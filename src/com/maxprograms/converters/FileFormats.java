@@ -309,7 +309,7 @@ public class FileFormats {
 				loadJSON(file, bom);
 				return JSON;
 			}
-		} catch (Exception e) {
+		} catch (Exception _) {
 			// do nothing
 		}
 		if (fileName.endsWith(".properties")) {

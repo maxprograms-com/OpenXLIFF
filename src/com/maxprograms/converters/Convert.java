@@ -368,7 +368,7 @@ public class Convert {
 					}
 				}
 				result = Resegmenter.run(xliff, srx, srcLang, CatalogBuilder.getCatalog(catalog), threads);
-			} catch (Exception e) {
+			} catch (Exception _) {
 				// do nothing
 			}
 		}
