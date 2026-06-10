@@ -213,6 +213,24 @@ public class Idml2Xliff {
 		skeleton = params.get("skeleton");
 		String encoding = params.get("srcEncoding");
 
+		// Parse maxThreads parameter
+		String maxThreadsParam = params.get("maxThreads");
+			int maxThreads;
+			if (maxThreadsParam != null) {
+				try {
+					maxThreads = Integer.parseInt(maxThreadsParam);
+					if (maxThreads < 1) {
+						maxThreads = 1;
+					}
+				} catch (NumberFormatException e) {
+					// Use default if invalid
+					maxThreads = Runtime.getRuntime().availableProcessors();
+				}
+			} else {
+				maxThreads = Runtime.getRuntime().availableProcessors();
+			}
+		params.put("maxThreads", String.valueOf(maxThreads));
+
 		List<String> entryOrder = new Vector<>();
 		Map<String, File> allEntries = new Hashtable<>();
 		Map<String, File> storyFiles = new Hashtable<>();
@@ -264,7 +282,7 @@ public class Idml2Xliff {
 				}
 			}
 
-			results = processStoriesInParallel(storiesToProcess, params);
+			results = processStoriesInParallel(storiesToProcess, params, maxThreads);
 			
 			// Index results by entry name for quick lookup
 			Map<String, StoryResult> resultMap = new Hashtable<>();
@@ -368,10 +386,11 @@ public class Idml2Xliff {
 		return result;
 	}
 
-	private static List<StoryResult> processStoriesInParallel(List<StoryEntry> stories, Map<String, String> params) {
+	private static List<StoryResult> processStoriesInParallel(List<StoryEntry> stories, Map<String, String> params,
+			int maxThreads) {
 		List<StoryResult> results = new Vector<>();
 
-		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+		try (ExecutorService executor = Executors.newFixedThreadPool(maxThreads)) {
 			List<Future<StoryResult>> futures = new Vector<>();
 
 			for (StoryEntry story : stories) {

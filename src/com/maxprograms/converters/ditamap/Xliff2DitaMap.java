@@ -118,7 +118,24 @@ public class Xliff2DitaMap {
 			File outputFile, int fileCount, String tgtlang, String catalog) {
 		List<ProcessingResult> results = new Vector<>();
 
-		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+		String maxThreadsParam = params.get("maxThreads");
+		int maxThreads;
+		if (maxThreadsParam != null) {
+			try {
+				maxThreads = Integer.parseInt(maxThreadsParam);
+				if (maxThreads < 1) {
+					maxThreads = 1;
+				}
+			} catch (NumberFormatException e) {
+				// Use default if invalid
+				maxThreads = Runtime.getRuntime().availableProcessors();
+			}
+		} else {
+			maxThreads = Runtime.getRuntime().availableProcessors();
+		}
+		params.put("maxThreads", String.valueOf(maxThreads));
+
+		try (ExecutorService executor = Executors.newFixedThreadPool(maxThreads)) {
 			List<Future<ProcessingResult>> futures = new ArrayList<>();
 
 			for (String topicFile : topicFiles) {

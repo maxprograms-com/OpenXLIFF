@@ -173,8 +173,11 @@ public class DitaParser {
 		// Start by queueing the input file for parallel processing
 		pendingRecurse.add(inputFile);
 
+		String maxThreadsParam = params.get("maxThreads");
+		int maxThreads = Integer.parseInt(maxThreadsParam);
+
 		int count = 0;
-		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+		ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
 		try {
 			do {
 				List<String> files = new ArrayList<>(pendingRecurse);

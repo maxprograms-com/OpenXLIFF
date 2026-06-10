@@ -351,23 +351,17 @@ public class Convert {
 		if (strict) {
 			params.put("strict", "yes");
 		}
+		if (!maxThreads.isEmpty()) {
+			params.put("maxThreads", maxThreads);
+		}
 		List<String> result = run(params);
 
 		if (resegment && Constants.SUCCESS.equals(result.get(0))) {
 			try {
-				int availableProcessors = Runtime.getRuntime().availableProcessors();
-				int threads = availableProcessors;
+				int threads = Runtime.getRuntime().availableProcessors();
 				if (!maxThreads.isEmpty()) {
 					try {
-						int requested = Integer.parseInt(maxThreads);
-						int maxReasonable = availableProcessors;
-						if (requested > maxReasonable) {
-							MessageFormat mf = new MessageFormat(Messages.getString("Convert.23"));
-							logger.log(Level.WARNING, mf.format(new String[] { String.valueOf(requested), String.valueOf(maxReasonable) }));
-							threads = maxReasonable;
-						} else {
-							threads = requested;
-						}
+						threads = Integer.parseInt(maxThreads);
 					} catch (NumberFormatException e) {
 						MessageFormat mf = new MessageFormat(Messages.getString("Convert.22"));
 						logger.log(Level.WARNING, mf.format(new String[] { maxThreads }));
