@@ -18,7 +18,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -127,9 +126,8 @@ public class RemoveTargets {
             }
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse(it.next());
+        for (Element child : children) {
+            recurse(child);
         }
     }
 

@@ -18,7 +18,6 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -114,9 +113,7 @@ public class Txml2Xliff {
 
 	private static void recurse(Element root) throws IOException {
 		List<Element> children = root.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			if (child.getName().equals("segment") || child.getName().equals("localizable")) {
 				parseSegment(child);
 			} else {
@@ -149,14 +146,12 @@ public class Txml2Xliff {
 		StringBuilder result = new StringBuilder();
 		result.append("<" + ele.getName() + ">");
 		List<XMLNode> content = ele.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode o = it.next();
-			if (o.getNodeType() == XMLNode.TEXT_NODE) {
-				result.append(o.toString());
+		for (XMLNode node : content) {
+			if (node.getNodeType() == XMLNode.TEXT_NODE) {
+				result.append(node.toString());
 			}
-			if (o.getNodeType() == XMLNode.ELEMENT_NODE) {
-				Element tag = (Element) o;
+			if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
+				Element tag = (Element) node;
 				result.append(parseTag(tag));
 			}
 		}
@@ -175,9 +170,7 @@ public class Txml2Xliff {
 
 	private static void parseComments(Element comments) throws IOException {
 		List<Element> list = comments.getChildren("comment");
-		Iterator<Element> it = list.iterator();
-		while (it.hasNext()) {
-			Element comment = it.next();
+		for (Element comment : list) {
 			writeStr("<note>");
 			writeStr(XMLUtils.cleanText(comment.getText()));
 			writeStr("</note>\n");

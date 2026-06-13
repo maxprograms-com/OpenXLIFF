@@ -10,7 +10,6 @@
 
 package com.maxprograms.converters.xliff;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -47,9 +46,7 @@ public class Xliff1xProcessor {
             Element segSource = root.getChild("seg-source");
             if (segSource != null) {
                 List<XMLNode> content = segSource.getContent();
-                Iterator<XMLNode> it = content.iterator();
-                while (it.hasNext()) {
-                    XMLNode node = it.next();
+                for (XMLNode node : content) {
                     if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                         Element e = (Element) node;
                         if ("mrk".equals(e.getName()) && "seg".equals(e.getAttributeValue("mtype"))) {
@@ -104,9 +101,7 @@ public class Xliff1xProcessor {
                 unit.addContent(target);
 
                 List<Element> matches = root.getChildren("alt-trans");
-                Iterator<Element> it = matches.iterator();
-                while (it.hasNext()) {
-                    Element match = it.next();
+                for (Element match : matches) {
                     Element altTrans = new Element("alt-trans");
                     String origin = match.getAttributeValue("origin");
                     if (!origin.isEmpty()) {
@@ -129,9 +124,7 @@ public class Xliff1xProcessor {
                     }
                 }
                 List<Element> notes = root.getChildren("note");
-                Iterator<Element> noteIt = notes.iterator();
-                while (noteIt.hasNext()) {
-                    Element note = noteIt.next();
+                for (Element note : notes) {
                     Element n = new Element("note");
                     n.setText(note.getText());
                     if (note.hasAttribute("priority")) {
@@ -162,9 +155,8 @@ public class Xliff1xProcessor {
             return;
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse1x(it.next(), units);
+        for (Element child : children) {
+            recurse1x(child, units);
         }
     }
 
@@ -174,9 +166,8 @@ public class Xliff1xProcessor {
             return true;
         }
         List<Element> children = e.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            if (hasTranslatableText(it.next())) {
+        for (Element child : children) {
+            if (hasTranslatableText(child)) {
                 return true;
             }
         }
@@ -185,9 +176,7 @@ public class Xliff1xProcessor {
 
     public static Element locateMrk(Element target, String mid) {
         List<XMLNode> content = target.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                 Element e = (Element) node;
                 if ("mrk".equals(e.getName()) && e.getAttributeValue("mid").equals(mid)) {
@@ -202,9 +191,7 @@ public class Xliff1xProcessor {
         List<XMLNode> result = new Vector<>();
         if (child != null) {
             List<XMLNode> content = child.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     result.add(node);
                 }
@@ -247,9 +234,7 @@ public class Xliff1xProcessor {
         StringBuilder sb = new StringBuilder();
         sb.append(getCleanHead(e));
         List<XMLNode> content = e.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode textNode = (TextNode) node;
                 sb.append(textNode.getText());
@@ -267,9 +252,7 @@ public class Xliff1xProcessor {
         StringBuilder sb = new StringBuilder();
         sb.append("<").append(e.getName());
         List<Attribute> atts = e.getAttributes();
-        Iterator<Attribute> it = atts.iterator();
-        while (it.hasNext()) {
-            Attribute a = it.next();
+        for (Attribute a : atts) {
             String name = a.getName();
             if (name.indexOf(":") != -1) {
                 name = name.replace(":", "__");

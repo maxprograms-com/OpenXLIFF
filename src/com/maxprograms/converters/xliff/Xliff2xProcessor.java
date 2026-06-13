@@ -10,7 +10,6 @@
 
 package com.maxprograms.converters.xliff;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -52,9 +51,7 @@ public class Xliff2xProcessor {
         if ("unit".equals(root.getName()) && !root.getAttributeValue("translate").equals("no")) {
             boolean preserve = root.getAttributeValue("xml:space").equals("preserve");
             List<Element> segments = root.getChildren("segment");
-            Iterator<Element> st = segments.iterator();
-            while (st.hasNext()) {
-                Element segment = st.next();
+            for (Element segment : segments) {
                 boolean isFinal = segment.getAttributeValue("state").equals("final");
                 Element unit = new Element("trans-unit");
                 unit.setAttribute("id", "" + units.size());
@@ -83,9 +80,7 @@ public class Xliff2xProcessor {
                     Element notes = root.getChild("notes");
                     if (notes != null) {
                         List<Element> noteList = notes.getChildren("note");
-                        Iterator<Element> it = noteList.iterator();
-                        while (it.hasNext()) {
-                            Element note = it.next();
+                        for (Element note : noteList) {
                             Element n = new Element("note");
                             n.setText(note.getText());
                             if (note.hasAttribute("priority")) {
@@ -104,9 +99,7 @@ public class Xliff2xProcessor {
                 Element matchesHolder = root.getChild("mtc:matches");
                 if (matchesHolder != null) {
                     List<Element> matches = matchesHolder.getChildren("mtc:match");
-                    Iterator<Element> it = matches.iterator();
-                    while (it.hasNext()) {
-                        Element match = it.next();
+                    for (Element match : matches) {
                         String ref = match.getAttributeValue("ref");
                         if (ref.equals("#" + segment.getAttributeValue("id"))) {
                             Element altTrans = new Element("alt-trans");
@@ -142,9 +135,8 @@ public class Xliff2xProcessor {
             return;
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse2x(it.next(), units);
+        for (Element child : children) {
+            recurse2x(child, units);
         }
     }
 
@@ -152,9 +144,7 @@ public class Xliff2xProcessor {
         List<XMLNode> result = new Vector<>();
         if (child != null) {
             List<XMLNode> content = child.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     result.add(node);
                 }
@@ -311,9 +301,8 @@ public class Xliff2xProcessor {
             return true;
         }
         List<Element> children = e.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            if (hasTranslatableText(it.next())) {
+        for (Element child : children) {
+            if (hasTranslatableText(child)) {
                 return true;
             }
         }

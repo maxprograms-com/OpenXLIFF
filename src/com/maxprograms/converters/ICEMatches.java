@@ -18,7 +18,6 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -260,9 +259,8 @@ public class ICEMatches {
             segments.add(root);
         } else {
             List<Element> list = root.getChildren();
-            Iterator<Element> it = list.iterator();
-            while (it.hasNext()) {
-                recurseSegments(it.next(), segments);
+            for (Element child : list) {
+                recurseSegments(child, segments);
             }
         }
     }

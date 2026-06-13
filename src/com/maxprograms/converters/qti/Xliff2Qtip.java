@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,12 +65,10 @@ public class Xliff2Qtip {
             Document doc = builder.build(xliffFile);
             Element root = doc.getRootElement();
             List<Element> files = root.getChildren("file");
-            Iterator<Element> it = files.iterator();
 
             XMLOutputter outputter = new XMLOutputter();
             outputter.preserveSpace(true);
-            while (it.hasNext()) {
-                Element file = it.next();
+            for (Element file : files) {
                 Element header = file.getChild("header");
                 if (header == null) {
                     throw new SAXException(Messages.getString("Xliff2Qtip.0"));
@@ -85,12 +82,10 @@ public class Xliff2Qtip {
                     throw new SAXException(Messages.getString("Xliff2Qtip.1"));
                 }
                 String sdlxliffFile = "";
-                for (int i = 0; i < propGroups.size(); i++) {
-                    Element propGroup = propGroups.get(i);
+                for (Element propGroup : propGroups) {
                     if (propGroup.getAttributeValue("name").equals("document")) {
                         List<Element> props = propGroup.getChildren("prop");
-                        for (int j = 0; j < props.size(); j++) {
-                            Element prop = props.get(j);
+                        for (Element prop : props) {
                             if (prop.getAttributeValue("prop-type").equals("original")) {
                                 sdlxliffFile = prop.getText();
                             }
@@ -158,9 +153,8 @@ public class Xliff2Qtip {
             out.close();
 
             Set<String> keySet = filesMap.keySet();
-            Iterator<String> kt = keySet.iterator();
-            while (kt.hasNext()) {
-                String file = filesMap.get(kt.next());
+            for (String key : keySet) {
+                String file = filesMap.get(key);
                 Files.delete(new File(file).toPath());
             }
 

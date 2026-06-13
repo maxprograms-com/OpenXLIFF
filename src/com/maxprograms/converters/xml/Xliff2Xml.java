@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -355,7 +354,6 @@ public class Xliff2Xml {
 	private String extractText(Element element) throws SAXException {
 		String result = "";
 		List<XMLNode> content = element.getContent();
-		Iterator<XMLNode> i = content.iterator();
 
 		if (element.getName().equals("ph")) {
 			return fixEntities(element);
@@ -363,8 +361,7 @@ public class Xliff2Xml {
 		if (ditaBased && element.getName().equals("mrk")) {
 			return cleanMrk(element);
 		}
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			switch (n.getNodeType()) {
 				case XMLNode.ELEMENT_NODE:
 					Element e = (Element) n;
@@ -407,9 +404,7 @@ public class Xliff2Xml {
 		}
 		String content = "";
 		List<XMLNode> nodes = element.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				content = content + addEntities(((TextNode) n).getText());
 			}
@@ -580,9 +575,7 @@ public class Xliff2Xml {
 		// the entities declared in the DTD
 
 		Set<String> enu = entities.keySet();
-		Iterator<String> it = enu.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : enu) {
 			String value = entities.get(key);
 			if (!value.isEmpty() && !key.equals("amp") && !key.equals("lt") && !key.equals("gt") && !key.equals("quot")
 					&& !key.equals("apos")) {
@@ -607,12 +600,10 @@ public class Xliff2Xml {
 		Element file = root.getChild("file");
 		Element body = file.getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
 
 		segments = new HashMap<>();
 
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			if (ditaBased) {
 				checkUntranslatable(unit);
 			}
@@ -624,14 +615,10 @@ public class Xliff2Xml {
 		Element header = file.getChild("header");
 		List<Element> groups = header.getChildren("prop-group");
 		if (groups != null) {
-			Iterator<Element> g = groups.iterator();
-			while (g.hasNext()) {
-				Element group = g.next();
+			for (Element group : groups) {
 				if (group.getAttributeValue("name").equals("entities")) {
 					List<Element> props = group.getChildren("prop");
-					Iterator<Element> p = props.iterator();
-					while (p.hasNext()) {
-						Element prop = p.next();
+					for (Element prop : props) {
 						entities.put(prop.getAttributeValue("prop-type"), prop.getText());
 					}
 				}

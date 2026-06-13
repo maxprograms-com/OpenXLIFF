@@ -18,10 +18,8 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -94,9 +92,9 @@ public class Xliff20 {
 	private boolean inResourceData;
 	private String fsPrefix = "fs";
 
-	private List<String> knownTypes = Arrays.asList("fmt", "ui", "quote", "link", "image", "other");
-	private List<String> xlfSubTypes = Arrays.asList("xlf:lb", "xlf:pb", "xlf:b", "xlf:i", "xlf:u", "xlf:var");
-	private List<String> fmtSubTypes = Arrays.asList("xlf:b", "xlf:i", "xlf:u", "xlf:lb", "xlf:pb");
+	private List<String> knownTypes = List.of("fmt", "ui", "quote", "link", "image", "other");
+	private List<String> xlfSubTypes = List.of("xlf:lb", "xlf:pb", "xlf:b", "xlf:i", "xlf:u", "xlf:var");
+	private List<String> fmtSubTypes = List.of("xlf:b", "xlf:i", "xlf:u", "xlf:lb", "xlf:pb");
 
 	public Xliff20() throws IOException {
 		registry = new RegistryParser();
@@ -251,9 +249,7 @@ public class Xliff20 {
 
 		// check namespaces
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> at = atts.iterator();
-		while (at.hasNext()) {
-			Attribute a = at.next();
+		for (Attribute a : atts) {
 			String prefix = a.getNamespace();
 			if ("xmlns".equals(prefix)) {
 				declaredNamespaces.put(a.getLocalName(), a.getValue());
@@ -931,9 +927,7 @@ public class Xliff20 {
 		}
 
 		// remove namespaces declared in current element
-		at = atts.iterator();
-		while (at.hasNext()) {
-			Attribute a = at.next();
+		for (Attribute a : atts) {
 			String prefix = a.getNamespace();
 			if ("xmlns".equals(prefix)) {
 				declaredNamespaces.remove(prefix);
@@ -959,9 +953,7 @@ public class Xliff20 {
 		}
 		Element source = segment.getChild("source");
 		List<Element> sourceList = source.getChildren();
-		Iterator<Element> it = sourceList.iterator();
-		while (it.hasNext()) {
-			Element tag = it.next();
+		for (Element tag : sourceList) {
 			if ("ph".equals(tag.getName())) {
 				List<Element> phList = target.getChildren("ph");
 				for (int i = 0; i < phList.size(); i++) {

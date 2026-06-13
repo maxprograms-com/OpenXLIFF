@@ -23,7 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -72,12 +71,10 @@ public class Xliff2Sdlrpx {
             Document doc = builder.build(xliffFile);
             Element root = doc.getRootElement();
             List<Element> files = root.getChildren("file");
-            Iterator<Element> it = files.iterator();
 
             XMLOutputter outputter = new XMLOutputter();
             outputter.preserveSpace(true);
-            while (it.hasNext()) {
-                Element file = it.next();
+            for (Element file : files) {
                 Element header = file.getChild("header");
                 if (header == null) {
                     throw new SAXException(Messages.getString("Xliff2Sdlrpx.0"));
@@ -91,12 +88,10 @@ public class Xliff2Sdlrpx {
                     throw new SAXException(Messages.getString("Xliff2Sdlrpx.1"));
                 }
                 String sdlxliffFile = "";
-                for (int i = 0; i < propGroups.size(); i++) {
-                    Element propGroup = propGroups.get(i);
+                for (Element propGroup : propGroups) {
                     if (propGroup.getAttributeValue("name").equals("document")) {
                         List<Element> props = propGroup.getChildren("prop");
-                        for (int j = 0; j < props.size(); j++) {
-                            Element prop = props.get(j);
+                        for (Element prop : props) {
                             if (prop.getAttributeValue("prop-type").equals("original")) {
                                 sdlxliffFile = prop.getText();
                             }
@@ -174,9 +169,8 @@ public class Xliff2Sdlrpx {
             out.close();
 
             Set<String> keySet = filesMap.keySet();
-            Iterator<String> kt = keySet.iterator();
-            while (kt.hasNext()) {
-                String file = filesMap.get(kt.next());
+            for (String key : keySet) {
+                String file = filesMap.get(key);
                 Files.delete(new File(file).toPath());
             }
 
@@ -236,9 +230,7 @@ public class Xliff2Sdlrpx {
 
     private static void recurseProject(Element node) {
         List<Element> children = node.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            Element child = it.next();
+        for (Element child : children) {
             if (child.getName().equals("Reports")) {
                 child.setContent(new ArrayList<>());
             }
@@ -246,10 +238,8 @@ public class Xliff2Sdlrpx {
                 if (child.getAttributeValue("LanguageCode").equalsIgnoreCase(tgtLang)) {
                     Element versions = child.getChild("FileVersions");
                     List<Element> files = versions.getChildren("FileVersion");
-                    Iterator<Element> ft = files.iterator();
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'0000Z'");
-                    while (ft.hasNext()) {
-                        Element file = ft.next();
+                    for (Element file : files) {
                         Date now = new Date();
                         file.setAttribute("FileTimeStamp", sdf.format(now));
                     }

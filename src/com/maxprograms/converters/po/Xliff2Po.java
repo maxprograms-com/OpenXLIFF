@@ -24,20 +24,19 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
 import com.maxprograms.converters.Constants;
 import com.maxprograms.converters.UnexistentSegmentException;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
 import com.maxprograms.xml.SAXBuilder;
-
-import org.xml.sax.SAXException;
 
 public class Xliff2Po {
 
@@ -193,14 +192,10 @@ public class Xliff2Po {
 
 	private static void writeFlags(Element segment, boolean fuzzy) throws IOException {
 		List<Element> groups = segment.getChildren("prop-group");
-		Iterator<Element> i = groups.iterator();
 		String flags = "";
-		while (i.hasNext()) {
-			Element group = i.next();
+		for (Element group : groups) {
 			List<Element> contexts = group.getChildren();
-			Iterator<Element> h = contexts.iterator();
-			while (h.hasNext()) {
-				Element prop = h.next();
+			for (Element prop : contexts) {
 				if (prop.getAttributeValue("ctype").equals("x-po-flags")) {
 					flags = prop.getText();
 				}
@@ -230,17 +225,13 @@ public class Xliff2Po {
 		String reference = "#:";
 		String newContext = "msgctxt \"";
 		List<Element> groups = segment.getChildren("context-group");
-		Iterator<Element> i = groups.iterator();
-		while (i.hasNext()) {
-			Element group = i.next();
+		for (Element group : groups) {
 			if (group.getAttributeValue("name").startsWith("x-po-reference")
 					&& group.getAttributeValue("purpose").equals("location")) {
 				String file = "";
 				String linenumber = "";
 				List<Element> contexts = group.getChildren();
-				Iterator<Element> h = contexts.iterator();
-				while (h.hasNext()) {
-					Element context = h.next();
+				for (Element context : contexts) {
 					if (context.getAttributeValue("context-type").equals("sourcefile")) {
 						file = context.getText();
 					}
@@ -259,9 +250,7 @@ public class Xliff2Po {
 			if (group.getAttributeValue("name").startsWith("x-po-reference")
 					&& group.getAttributeValue("purpose").equals("x-unknown")) {
 				List<Element> contexts = group.getChildren();
-				Iterator<Element> h = contexts.iterator();
-				while (h.hasNext()) {
-					Element context = h.next();
+				for (Element context : contexts) {
 					if (reference.equals("#:")) {
 						reference = reference + " " + context.getText();
 					} else {
@@ -271,9 +260,7 @@ public class Xliff2Po {
 			}
 			if (group.getAttributeValue("name").startsWith("x-po-msgctxt")) {
 				List<Element> contexts = group.getChildren();
-				Iterator<Element> h = contexts.iterator();
-				while (h.hasNext()) {
-					Element context = h.next();
+				for (Element context : contexts) {
 					newContext = newContext + context.getText();
 				}
 			}
@@ -288,15 +275,11 @@ public class Xliff2Po {
 
 	private static void writeContext(Element segment) throws IOException {
 		List<Element> groups = segment.getChildren("context-group");
-		Iterator<Element> i = groups.iterator();
-		while (i.hasNext()) {
-			Element group = i.next();
+		for (Element group : groups) {
 			if (group.getAttributeValue("name").startsWith("x-po-entry-header")
 					&& group.getAttributeValue("purpose").equals("information")) {
 				List<Element> contexts = group.getChildren();
-				Iterator<Element> h = contexts.iterator();
-				while (h.hasNext()) {
-					Element context = h.next();
+				for (Element context : contexts) {
 					if (context.getAttributeValue("context-type").equals("x-po-autocomment")) {
 						List<String> comments = splitLines(context.getText());
 						for (int j = 0; j < comments.size(); j++) {
@@ -315,16 +298,12 @@ public class Xliff2Po {
 
 	private static void writeComments(Element segment) throws IOException {
 		List<Element> notes = segment.getChildren("note");
-		Iterator<Element> i = notes.iterator();
-		while (i.hasNext()) {
-			Element note = i.next();
+		for (Element note : notes) {
 			if (note.getAttributeValue("annotates", "general").equals("source")) {
 				continue;
 			}
 			List<String> lines = splitLines(note.getText());
-			Iterator<String> h = lines.iterator();
-			while (h.hasNext()) {
-				String comment = h.next();
+			for (String comment : lines) {
 				writeString("# " + comment.trim() + "\n");
 			}
 		}
@@ -363,9 +342,7 @@ public class Xliff2Po {
 
 	private static void recurse(Element e) {
 		List<Element> list = e.getChildren();
-		Iterator<Element> i = list.iterator();
-		while (i.hasNext()) {
-			Element u = i.next();
+		for (Element u : list) {
 			if (u.getName().equals("trans-unit")) {
 				segments.put(u.getAttributeValue("id"), u);
 			} else if (u.getName().equals("group") && u.getAttributeValue("restype").equals("x-gettext-plurals")) {

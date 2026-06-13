@@ -17,7 +17,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,9 +83,7 @@ public class XliffModel {
 		translatable = new HashMap<>();
 		approved = new HashMap<>();
 		List<Attribute> atts = root.getAttributes();
-		Iterator<Attribute> it = atts.iterator();
-		while (it.hasNext()) {
-			Attribute a = it.next();
+		for (Attribute a : atts) {
 			if (a.getName().startsWith("xmlns:")) {
 				String ns = a.getName().substring("xmlns:".length());
 				if (!ns.equals("xml")) {
@@ -221,9 +218,8 @@ public class XliffModel {
 			}
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				recurse(it.next());
+			for (Element child : children) {
+				recurse(child);
 			}
 		}
 	}
@@ -239,9 +235,8 @@ public class XliffModel {
 			mrks.add(element);
 		} else {
 			List<Element> children = element.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				recurseMrks(it.next());
+			for (Element child : children) {
+				recurseMrks(child);
 			}
 		}
 	}
@@ -333,17 +328,13 @@ public class XliffModel {
 					Map<String, Element> targets1 = new HashMap<>();
 					if (target != null) {
 						List<Element> tmarks = getSegments(target);
-						Iterator<Element> tt = tmarks.iterator();
-						while (tt.hasNext()) {
-							Element mrk = tt.next();
+						for (Element mrk : tmarks) {
 							targets1.put(mrk.getAttributeValue("mid"), mrk);
 						}
 					}
 					List<Element> mrks1 = getSegments(segSource);
 					if (!mrks1.isEmpty()) {
-						Iterator<Element> it = mrks1.iterator();
-						while (it.hasNext()) {
-							Element mrk = it.next();
+						for (Element mrk : mrks1) {
 							writeStr("<trans-unit id=\"" + root1.getAttributeValue("id") + ':'
 									+ mrk.getAttributeValue("mid") + "\" xml:space=\"preserve\">\n");
 							// write new source
@@ -368,9 +359,8 @@ public class XliffModel {
 		} else {
 			// not in <trans-unit>
 			List<Element> children = root1.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				normalize(it.next());
+			for (Element child : children) {
+				normalize(child);
 			}
 		}
 
@@ -378,9 +368,7 @@ public class XliffModel {
 
 	private boolean containsText(Element source) {
 		List<XMLNode> nodes = source.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE && !n.toString().trim().isEmpty()) {
 				return true;
 			}
@@ -400,9 +388,7 @@ public class XliffModel {
 	private List<Element> getSegments(Element e) {
 		List<Element> result = new ArrayList<>();
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			if (child.getName().equals("mrk") && child.getAttributeValue("mtype").equals("seg")) {
 				result.add(child);
 			} else {
@@ -414,9 +400,7 @@ public class XliffModel {
 
 	private void recurseSource(Element mrk) throws IOException {
 		List<XMLNode> nodes = mrk.getContent();
-		Iterator<XMLNode> nt = nodes.iterator();
-		while (nt.hasNext()) {
-			XMLNode n = nt.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeStr(n.toString());
 			}
@@ -433,9 +417,7 @@ public class XliffModel {
 
 	private void recurseTarget(Element mrk) throws IOException {
 		List<XMLNode> tnodes = mrk.getContent();
-		Iterator<XMLNode> tnt = tnodes.iterator();
-		while (tnt.hasNext()) {
-			XMLNode n = tnt.next();
+		for (XMLNode n : tnodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeStr(n.toString());
 			}

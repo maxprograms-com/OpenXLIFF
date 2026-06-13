@@ -163,12 +163,10 @@ public class Xliff2json {
         encoding = encodings.get(0).getData();
         Element body = file.getChild("body");
         List<Element> units = body.getChildren("trans-unit");
-        Iterator<Element> i = units.iterator();
 
         segments = new HashMap<>();
 
-        while (i.hasNext()) {
-            Element unit = i.next();
+        for (Element unit : units) {
             segments.put(unit.getAttributeValue("id"), unit);
         }
     }
@@ -231,9 +229,7 @@ public class Xliff2json {
     private static String extractText(Element element, boolean restoreCrlf) {
         StringBuilder result = new StringBuilder();
         List<XMLNode> content = element.getContent();
-        Iterator<XMLNode> i = content.iterator();
-        while (i.hasNext()) {
-            XMLNode n = i.next();
+        for (XMLNode n : content) {
             if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
                 Element e = (Element) n;
                 result.append(extractText(e, restoreCrlf));

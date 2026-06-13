@@ -15,7 +15,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,7 +42,8 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Wpml2Xliff {
 
-    private static final Pattern START_TAG_PATTERN = Pattern.compile("<[A-Za-z0-9]+([\\s][A-Za-z]+=[\"|\'][^<&>]*[\"|\'])*[\\s]*[/]?>");
+    private static final Pattern START_TAG_PATTERN = Pattern
+            .compile("<[A-Za-z0-9]+([\\s][A-Za-z]+=[\"|\'][^<&>]*[\"|\'])*[\\s]*[/]?>");
     private static final Pattern END_TAG_PATTERN = Pattern.compile("</[A-Za-z0-9]+>");
 
     private static final class Context {
@@ -145,9 +145,7 @@ public class Wpml2Xliff {
         }
 
         List<XMLNode> nodes = root.getContent();
-        Iterator<XMLNode> it = nodes.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : nodes) {
             switch (node.getNodeType()) {
                 case XMLNode.ELEMENT_NODE:
                     Element child = (Element) node;
@@ -166,9 +164,7 @@ public class Wpml2Xliff {
                         List<List<XMLNode>> array = new ArrayList<>();
                         List<XMLNode> currentContent = new ArrayList<>();
                         List<XMLNode> srcContent = src.getContent();
-                        Iterator<XMLNode> st = srcContent.iterator();
-                        while (st.hasNext()) {
-                            XMLNode n = st.next();
+                        for (XMLNode n : srcContent) {
                             if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
                                 currentContent.add(n);
                             }
@@ -211,9 +207,7 @@ public class Wpml2Xliff {
                             } else {
                                 Element segmented = ctx.segmenter.segment(source);
                                 List<Element> list = segmented.getChildren("mrk");
-                                Iterator<Element> mt = list.iterator();
-                                while (mt.hasNext()) {
-                                    Element mrk = mt.next();
+                                for (Element mrk : list) {
                                     Element unit = new Element("trans-unit");
                                     unit.setAttribute("id", "" + ctx.segId);
                                     newRoot.addContent(unit);
@@ -250,9 +244,7 @@ public class Wpml2Xliff {
     protected static String getText(Element e) {
         StringBuilder builder = new StringBuilder();
         List<XMLNode> list = e.getContent();
-        Iterator<XMLNode> it = list.iterator();
-        while (it.hasNext()) {
-            XMLNode n = it.next();
+        for (XMLNode n : list) {
             if (n.getNodeType() == XMLNode.TEXT_NODE) {
                 builder.append(((TextNode) n).getText());
             }
@@ -265,9 +257,7 @@ public class Wpml2Xliff {
 
     private static boolean containsText(Element child) {
         List<XMLNode> list = child.getContent();
-        Iterator<XMLNode> it = list.iterator();
-        while (it.hasNext()) {
-            XMLNode n = it.next();
+        for (XMLNode n : list) {
             if (n.getNodeType() == XMLNode.TEXT_NODE) {
                 String t = ((TextNode) n).getText();
                 if (!t.isBlank()) {
@@ -281,9 +271,7 @@ public class Wpml2Xliff {
     private static void removeCdata(Element e) {
         List<XMLNode> newContent = new ArrayList<>();
         List<XMLNode> nodes = e.getContent();
-        Iterator<XMLNode> it = nodes.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : nodes) {
             switch (node.getNodeType()) {
                 case XMLNode.ELEMENT_NODE, XMLNode.TEXT_NODE:
                     newContent.add(node);
@@ -307,9 +295,7 @@ public class Wpml2Xliff {
         if (matcher.find()) {
             List<XMLNode> newContent = new ArrayList<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = t.getText();
@@ -346,9 +332,7 @@ public class Wpml2Xliff {
         if (matcher.find()) {
             List<XMLNode> newContent = new ArrayList<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = t.getText();

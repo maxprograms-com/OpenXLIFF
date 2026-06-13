@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -304,9 +303,8 @@ public class DitaParser {
 			return true;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			if (containsText(it.next())) {
+		for (Element child : children) {
+			if (containsText(child)) {
 				return true;
 			}
 		}
@@ -316,9 +314,7 @@ public class DitaParser {
 	private String svgText(Element e) {
 		StringBuilder sb = new StringBuilder();
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				TextNode t = (TextNode) node;
 				sb.append(t.getText());
@@ -445,9 +441,7 @@ public class DitaParser {
 							if (ref != null) {
 								e.setContent(ref.getContent());
 								List<Element> children = e.getChildren();
-								Iterator<Element> ie = children.iterator();
-								while (ie.hasNext()) {
-									Element child = ie.next();
+								for (Element child : children) {
 									recurse(child, file);
 								}
 							} else {
@@ -474,9 +468,7 @@ public class DitaParser {
 							Element ref = getRoot(file);
 							e.setContent(ref.getContent());
 							List<Element> children = e.getChildren();
-							Iterator<Element> ie = children.iterator();
-							while (ie.hasNext()) {
-								Element child = ie.next();
+							for (Element child : children) {
 								recurse(child, file);
 							}
 						} catch (Exception ex) {
@@ -523,9 +515,8 @@ public class DitaParser {
 				if (ref != null) {
 					e.setContent(ref.getContent());
 					List<Element> children = e.getChildren();
-					Iterator<Element> ie = children.iterator();
-					while (ie.hasNext()) {
-						recurse(ie.next(), file);
+					for (Element child : children) {
+						recurse(child, file);
 					}
 					return;
 				}
@@ -600,9 +591,8 @@ public class DitaParser {
 							if (ref != null) {
 								e.setContent(ref.getContent());
 								List<Element> children = e.getChildren();
-								Iterator<Element> ie = children.iterator();
-								while (ie.hasNext()) {
-									recurse(ie.next(), kref);
+								for (Element child : children) {
+									recurse(child, kref);
 								}
 								return;
 							}
@@ -666,9 +656,7 @@ public class DitaParser {
 			}
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			recurse(child, parentFile);
 		}
 	}
@@ -706,9 +694,8 @@ public class DitaParser {
 			return true;
 		}
 		List<Element> children = svg.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			if (hasText(it.next())) {
+		for (Element child : children) {
+			if (hasText(child)) {
 				return true;
 			}
 		}
@@ -828,9 +815,7 @@ public class DitaParser {
 			return topicmeta;
 		}
 		List<Element> children = topicmeta.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			if (child.getName().equals(name)) {
 				return child;
 			}
@@ -870,11 +855,9 @@ public class DitaParser {
 		Element root = doc.getRootElement();
 		if (root.getName().equals("val")) {
 			List<Element> props = root.getChildren("prop");
-			Iterator<Element> it = props.iterator();
 			excludeTable = new HashMap<>();
 			includeTable = new HashMap<>();
-			while (it.hasNext()) {
-				Element prop = it.next();
+			for (Element prop : props) {
 				if (prop.getAttributeValue("action", "include").equals("exclude")) {
 					String att = prop.getAttributeValue("att");
 					String val = prop.getAttributeValue("val");
@@ -909,9 +892,7 @@ public class DitaParser {
 	private boolean filterOut(Element e) {
 		if (filterAttributes) {
 			List<Attribute> atts = e.getAttributes();
-			Iterator<Attribute> it = atts.iterator();
-			while (it.hasNext()) {
-				Attribute a = it.next();
+			for (Attribute a : atts) {
 				if (excludeTable.containsKey(a.getName())) {
 					Set<String> forbidden = excludeTable.get(a.getName());
 					if (forbidden.isEmpty() && includeTable.containsKey(a.getName())) {
@@ -995,9 +976,7 @@ public class DitaParser {
 			topicId = id;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			Element result = locate(child, topicId, searched);
 			if (result != null) {
 				return result;
@@ -1060,9 +1039,7 @@ public class DitaParser {
 			return root;
 		}
 		List<Element> children = root.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			Element result = locateReferenced(child, id);
 			if (result != null) {
 				return result;

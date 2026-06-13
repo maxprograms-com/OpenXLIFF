@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -65,9 +64,8 @@ public class Xliff2Office {
 			Document doc = builder.build(xliffFile);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				saveFile(it.next(), xliffFile);
+			for (Element file : files) {
+				saveFile(file, xliffFile);
 			}
 			String skeleton = params.get("skeleton");
 			if (isEmbedded) {
@@ -192,9 +190,8 @@ public class Xliff2Office {
 			e.setAttribute("xml:space", "preserve");
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			addPreserveSpace(it.next());
+		for (Element child : children) {
+			addPreserveSpace(child);
 		}
 	}
 
@@ -207,9 +204,7 @@ public class Xliff2Office {
 		root.addContent(file);
 		File xliff = File.createTempFile("tmp", ".xlf", new File(xliffFile).getParentFile());
 		List<Element> groups = file.getChild("header").getChildren("prop-group");
-		Iterator<Element> i = groups.iterator();
-		while (i.hasNext()) {
-			Element group = i.next();
+		for (Element group : groups) {
 			if (group.getAttributeValue("name").equals("document")) {
 				filesTable.put(group.getChild("prop").getText(), xliff.getAbsolutePath());
 			}

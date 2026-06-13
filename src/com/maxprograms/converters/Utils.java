@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
@@ -131,11 +130,9 @@ public class Utils {
 		TreeMap<String, Charset> charsets = new TreeMap<>(Charset.availableCharsets());
 		Set<String> keys = charsets.keySet();
 		String[] codes = new String[keys.size()];
-
-		Iterator<String> i = keys.iterator();
 		int j = 0;
-		while (i.hasNext()) {
-			Charset cset = charsets.get(i.next());
+		for (String key : keys) {
+			Charset cset = charsets.get(key);
 			codes[j++] = cset.displayName();
 		}
 		return codes;
@@ -214,10 +211,8 @@ public class Utils {
 
 	public static String pureText(Element seg) {
 		List<XMLNode> l = seg.getContent();
-		Iterator<XMLNode> i = l.iterator();
 		StringBuilder text = new StringBuilder();
-		while (i.hasNext()) {
-			XMLNode o = i.next();
+		for (XMLNode o : l) {
 			if (o.getNodeType() == XMLNode.TEXT_NODE) {
 				text.append(((TextNode) o).getText());
 			} else if (o.getNodeType() == XMLNode.ELEMENT_NODE) {
@@ -238,9 +233,7 @@ public class Utils {
 		int count = 0;
 		int errors = 0;
 		List<XMLNode> content = source1.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element e = (Element) n;
 				tags.add(e);
@@ -248,10 +241,8 @@ public class Utils {
 			}
 		}
 		content = source2.getContent();
-		i = content.iterator();
 		int c2 = 0;
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element e = (Element) n;
 				c2++;

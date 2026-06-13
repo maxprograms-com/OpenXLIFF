@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -87,9 +86,8 @@ public class Xliff2DitaMap {
 			Document doc = builder.build(xliffFile);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				saveFile(it.next(), xliffFile);
+			for (Element file : files) {
+				saveFile(file, xliffFile);
 			}
 			String tgtlang = files.get(0).getAttributeValue("target-language",
 					files.get(0).getAttributeValue("source-language"));
@@ -290,9 +288,7 @@ public class Xliff2DitaMap {
 		} else {
 			List<XMLNode> content = e.getContent();
 			List<XMLNode> newContent = new ArrayList<>();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 					Element child = (Element) n;
 					emptyElement(child);

@@ -12,7 +12,6 @@
 
 package com.maxprograms.converters.json;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -86,9 +85,7 @@ public class ElementBuilder {
         if (matcher.find()) {
             List<XMLNode> newContent = new Vector<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = preserveSpaces ? t.getText() : normalise(t.getText());
@@ -143,9 +140,7 @@ public class ElementBuilder {
         if (matcher.find()) {
             List<XMLNode> newContent = new Vector<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = preserveSpaces ? t.getText() : normalise(t.getText());
@@ -200,9 +195,8 @@ public class ElementBuilder {
                 Element previousTag = (Element) newContent.get(newContent.size() - 1);
                 Element currentTag = (Element) node;
                 List<XMLNode> tagContent = currentTag.getContent();
-                Iterator<XMLNode> it = tagContent.iterator();
-                while (it.hasNext()) {
-                    previousTag.addContent(it.next());
+                for (XMLNode n : tagContent) {
+                    previousTag.addContent(n);
                 }
             } else {
                 newContent.add(node);

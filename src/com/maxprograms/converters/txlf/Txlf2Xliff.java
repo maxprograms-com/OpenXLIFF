@@ -15,7 +15,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -168,18 +167,15 @@ public class Txlf2Xliff {
             return;
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse(it.next(), units);
+        for (Element child : children) {
+            recurse(child, units);
         }
     }
 
     private static void renameAttributes(Element e) {
         List<Attribute> atts = e.getAttributes();
-        Iterator<Attribute> at = atts.iterator();
         Vector<String> change = new Vector<>();
-        while (at.hasNext()) {
-            Attribute a = at.next();
+        for (Attribute a : atts) {
             if (a.getName().indexOf(":") != -1) {
                 String ns = a.getName().substring(0, a.getName().indexOf(":"));
                 if ("gs4tr".equals(ns)) {
@@ -194,9 +190,8 @@ public class Txlf2Xliff {
             e.removeAttribute(name);
         }
         List<Element> children = e.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            renameAttributes(it.next());
+        for (Element child : children) {
+            renameAttributes(child);
         }
     }
 
@@ -204,9 +199,7 @@ public class Txlf2Xliff {
         List<XMLNode> result = new Vector<>();
         if (child != null) {
             List<XMLNode> content = child.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     result.add(node);
                 }

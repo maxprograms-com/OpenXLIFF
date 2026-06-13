@@ -18,7 +18,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -155,9 +154,7 @@ public class Resegmenter {
                     int id = 0;
                     root.removeChild(segment);
                     List<XMLNode> content = segSource.getContent();
-                    Iterator<XMLNode> it = content.iterator();
-                    while (it.hasNext()) {
-                        XMLNode n = it.next();
+                    for (XMLNode n : content) {
                         if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
                             Element e = (Element) n;
                             if ("mrk".equals(e.getName()) && "seg".equals(e.getAttributeValue("mtype"))) {
@@ -222,18 +219,15 @@ public class Resegmenter {
             }
         } else {
             List<Element> children = root.getChildren();
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                recurse(ctx, it.next());
+            for (Element child : children) {
+                recurse(ctx, child);
             }
         }
     }
 
     private static boolean hasText(Element e) {
         List<XMLNode> content = e.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode t = (TextNode) node;
                 if (!t.getText().isBlank()) {

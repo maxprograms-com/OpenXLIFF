@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public class ToXliff2 {
 	private static int fileId;
 	private static int mrkCount;
 
-	private static List<String> preserveAttributes = Arrays.asList("reformat", "datatype", "ts", "phase-name",
+	private static List<String> preserveAttributes = List.of("reformat", "datatype", "ts", "phase-name",
 			"restype", "resname", "extradata", "help-id", "menu", "menu-option", "menu-name", "coord", "font",
 			"css-style", "style", "exstyle", "extype", "maxbytes", "minbytes", "size-unit", "maxheight", "minheight",
 			"maxwidth", "minwidth", "charclass");
@@ -127,7 +126,7 @@ public class ToXliff2 {
 
 	public static List<String> run(String sourceFile, String outputFile, String catalog, String version) {
 		List<String> result = new ArrayList<>();
-		if (!Arrays.asList("2.0", "2.1", "2.2").contains(version)) {
+		if (!List.of("2.0", "2.1", "2.2").contains(version)) {
 			result.add(Constants.ERROR);
 			result.add(Messages.getString("ToXliff2.1"));
 			return result;
@@ -201,9 +200,7 @@ public class ToXliff2 {
 				file.addContent(new PI("ts", source.getAttributeValue("ts")));
 			}
 			List<Attribute> atts = source.getAttributes();
-			Iterator<Attribute> at = atts.iterator();
-			while (at.hasNext()) {
-				Attribute a = at.next();
+			for (Attribute a : atts) {
 				if (a.getName().startsWith("xmlns:")) {
 					file.setAttribute(a);
 				}
@@ -252,14 +249,11 @@ public class ToXliff2 {
 				}
 
 				List<Element> propGroups = header.getChildren("prop-group");
-				for (int i = 0; i < propGroups.size(); i++) {
-					Element sgroup = propGroups.get(i);
+				for (Element sgroup : propGroups) {
 					Element tgroup = new Element("mda:metaGroup");
 					tgroup.setAttribute("category", sgroup.getAttributeValue("name"));
 					List<Element> props = sgroup.getChildren("prop");
-					Iterator<Element> it = props.iterator();
-					while (it.hasNext()) {
-						Element prop = it.next();
+					for (Element prop : props) {
 						Element meta = new Element("mda:meta");
 						meta.setAttribute("type", prop.getAttributeValue("prop-type"));
 						meta.addContent(prop.getText());
@@ -329,9 +323,7 @@ public class ToXliff2 {
 			if (!pis.isEmpty()) {
 				Element piGroup = new Element("mda:metaGroup");
 				piGroup.setAttribute("category", "PI");
-				Iterator<PI> pit = pis.iterator();
-				while (pit.hasNext()) {
-					PI pi = pit.next();
+				for (PI pi : pis) {
 					if ("metadata".equals(pi.getTarget())) {
 						file.addContent(pi);
 					} else if ("reviewProject".equals(pi.getTarget()) || "tool".equals(pi.getTarget())
@@ -399,10 +391,8 @@ public class ToXliff2 {
 				unit.setAttribute("translate", "no");
 			}
 			List<Attribute> atts = source.getAttributes();
-			Iterator<Attribute> at = atts.iterator();
 			List<Attribute> otherAttributes = new ArrayList<>();
-			while (at.hasNext()) {
-				Attribute a = at.next();
+			for (Attribute a : atts) {
 				if (a.getName().indexOf(':') != -1 && !a.getName().startsWith("xml:")) {
 					unit.setAttribute(a);
 				} else if (preserveAttributes.contains(a.getName())
@@ -416,9 +406,7 @@ public class ToXliff2 {
 				Element metaGroup = new Element("mda:metaGroup");
 				metaGroup.setAttribute("category", "transUnitAttributes");
 				metadata.addContent(metaGroup);
-				Iterator<Attribute> ats = otherAttributes.iterator();
-				while (ats.hasNext()) {
-					Attribute a = ats.next();
+				for (Attribute a : otherAttributes) {
 					Element meta = new Element("mda:meta");
 					meta.setAttribute("type", a.getName());
 					meta.setText(a.getValue());
@@ -452,9 +440,7 @@ public class ToXliff2 {
 			}
 			List<PI> pis = source.getPI();
 			if (!pis.isEmpty()) {
-				Iterator<PI> pit = pis.iterator();
-				while (pit.hasNext()) {
-					PI pi = pit.next();
+				for (PI pi : pis) {
 					if ("metadata".equals(pi.getTarget())) {
 						unit.addContent(pi);
 					}
@@ -605,9 +591,8 @@ public class ToXliff2 {
 		}
 
 		List<Element> children = source.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			recurse(it.next(), target);
+		for (Element child : children) {
+			recurse(child, target);
 		}
 	}
 
@@ -662,17 +647,14 @@ public class ToXliff2 {
 			return;
 		}
 		List<Element> children = tag.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			harvestInline(originalData, tagAttributes, it.next());
+		for (Element child : children) {
+			harvestInline(originalData, tagAttributes, child);
 		}
 	}
 
 	private static boolean containsTag(Element originalData, String id) {
 		List<Element> tags = originalData.getChildren("data");
-		Iterator<Element> it = tags.iterator();
-		while (it.hasNext()) {
-			Element tag = it.next();
+		for (Element tag : tags) {
 			if (tag.getAttributeValue("id").equals(id)) {
 				return true;
 			}
@@ -690,9 +672,7 @@ public class ToXliff2 {
 			group.setAttribute("category", "attributes");
 			group.setAttribute("id", id);
 			tagAttributes.addContent(group);
-			Iterator<Attribute> it = atts.iterator();
-			while (it.hasNext()) {
-				Attribute a = it.next();
+			for (Attribute a : atts) {
 				if (!"id".equals(a.getName())) {
 					Element meta = new Element("mda:meta");
 					meta.setAttribute("type", a.getName());
@@ -764,7 +744,7 @@ public class ToXliff2 {
 			if (mtype.equals("protected")) {
 				mrk.setAttribute("translate", "no");
 			}
-			if (Arrays.asList("generic", "comment", "term").contains(mtype)) {
+			if (List.of("generic", "comment", "term").contains(mtype)) {
 				mrk.setAttribute("type", mtype);
 			} else {
 				mrk.setAttribute("type", "oxlf:" + mtype.replace(":", "_"));
@@ -778,9 +758,7 @@ public class ToXliff2 {
 			}
 			List<XMLNode> newContent = new ArrayList<>();
 			List<XMLNode> content = e.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode node = it.next();
+			for (XMLNode node : content) {
 				if (node.getNodeType() == XMLNode.TEXT_NODE) {
 					newContent.add(node);
 				}
@@ -799,9 +777,7 @@ public class ToXliff2 {
 			pc.setAttribute("id", id);
 			List<XMLNode> newContent = new ArrayList<>();
 			List<XMLNode> content = e.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode node = it.next();
+			for (XMLNode node : content) {
 				if (node.getNodeType() == XMLNode.TEXT_NODE) {
 					newContent.add(node);
 				}
@@ -821,9 +797,7 @@ public class ToXliff2 {
 			return result;
 		}
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				result.add(node);
 			}

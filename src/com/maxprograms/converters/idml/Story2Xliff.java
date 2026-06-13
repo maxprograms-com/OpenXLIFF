@@ -18,7 +18,6 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -97,9 +96,7 @@ public class Story2Xliff {
 			}
 			writeSkeleton("<" + root.getName());
 			List<Attribute> atts = root.getAttributes();
-			Iterator<Attribute> ia = atts.iterator();
-			while (ia.hasNext()) {
-				Attribute a = ia.next();
+			for (Attribute a : atts) {
 				writeSkeleton(
 						" " + a.getName() + "=\"" + XMLUtils.cleanText(a.getValue()).replace("\"", "&quote;")
 								+ "\"");
@@ -107,17 +104,13 @@ public class Story2Xliff {
 			writeSkeleton(">");
 
 			List<XMLNode> content = root.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 					Element e = (Element) n;
 					if (e.getName().equals("Story")) {
 						writeSkeleton("<" + e.getName());
 						atts = e.getAttributes();
-						ia = atts.iterator();
-						while (ia.hasNext()) {
-							Attribute a = ia.next();
+						for (Attribute a : atts) {
 							writeSkeleton(" " + a.getName() + "=\""
 									+ XMLUtils.cleanText(a.getValue()).replaceAll("\"", "&quote;") + "\"");
 						}
@@ -160,10 +153,8 @@ public class Story2Xliff {
 	private void removeChangeTracking(Element root) {
 		List<XMLNode> newContent = new ArrayList<>();
 		List<XMLNode> nodes = root.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
 		boolean changed = false;
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element e = (Element) n;
 				if (e.getName().equals("Change")) {
@@ -195,9 +186,7 @@ public class Story2Xliff {
 		List<XMLNode> newContent = new ArrayList<>();
 		Element current = null;
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
 				if (current == null) {
 					current = (Element) node;
@@ -206,9 +195,8 @@ public class Story2Xliff {
 					Element next = (Element) node;
 					if (current.getName().equals(next.getName()) && validateAttributes(current, next)) {
 						List<XMLNode> nodes = next.getContent();
-						Iterator<XMLNode> nt = nodes.iterator();
-						while (nt.hasNext()) {
-							current.addContent(nt.next());
+						for (XMLNode n : nodes) {
+							current.addContent(n);
 						}
 					} else {
 						newContent.add(next);
@@ -221,8 +209,8 @@ public class Story2Xliff {
 		}
 		e.setContent(newContent);
 		List<Element> children = e.getChildren();
-		for (int i = 0; i < children.size(); i++) {
-			mergeContent(children.get(i));
+		for (Element child : children) {
+			mergeContent(child);
 		}
 	}
 
@@ -247,9 +235,7 @@ public class Story2Xliff {
 
 	private void processStory(Segmenter segmenter, Element root) throws IOException {
 		List<XMLNode> content = root.getContent();
-		Iterator<XMLNode> nit = content.iterator();
-		while (nit.hasNext()) {
-			XMLNode n = nit.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeSkeleton(n.toString());
 			}
@@ -267,9 +253,7 @@ public class Story2Xliff {
 					} else {
 						writeSkeleton("<" + e.getName());
 						List<Attribute> atts = e.getAttributes();
-						Iterator<Attribute> ia = atts.iterator();
-						while (ia.hasNext()) {
-							Attribute a = ia.next();
+						for (Attribute a : atts) {
 							writeSkeleton(" " + a.getName() + "=\""
 									+ XMLUtils.cleanText(a.getValue()).replace("\"", "&quote;") + "\"");
 						}
@@ -293,19 +277,15 @@ public class Story2Xliff {
 		mergeStyles(e);
 		writeSkeleton("<" + e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			writeSkeleton(
 					" " + a.getName() + "=\"" + XMLUtils.cleanText(a.getValue()).replace("\"", "&quote;") + "\"");
 		}
 		writeSkeleton(">");
 		StringBuilder source = new StringBuilder("<ph>");
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
 		boolean preamble = true;
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				source.append(n.toString());
 			}
@@ -429,9 +409,7 @@ public class Story2Xliff {
 			result.setAttribute(a.getName(), a.getValue());
 		}
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element child = (Element) node;
 				if (!child.getName().equals("Content")) {
@@ -458,9 +436,8 @@ public class Story2Xliff {
 			e.removeAttribute("DigitsType");
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			cleanAttributes(it.next());
+		for (Element child : children) {
+			cleanAttributes(child);
 		}
 	}
 
@@ -527,9 +504,7 @@ public class Story2Xliff {
 		} else {
 			result = result + "<" + e.getName();
 			List<Attribute> atts = e.getAttributes();
-			Iterator<Attribute> ia = atts.iterator();
-			while (ia.hasNext()) {
-				Attribute a = ia.next();
+			for (Attribute a : atts) {
 				result = result + " " + a.getName() + "=\""
 						+ XMLUtils.cleanText(a.getValue()).replace("\"", "&quote;") + "\"";
 			}
@@ -538,9 +513,7 @@ public class Story2Xliff {
 			} else {
 				result = result + ">";
 				List<XMLNode> content = e.getContent();
-				Iterator<XMLNode> it = content.iterator();
-				while (it.hasNext()) {
-					XMLNode n = it.next();
+				for (XMLNode n : content) {
 					if (n.getNodeType() == XMLNode.TEXT_NODE) {
 						result = result + n.toString();
 					}
@@ -559,9 +532,8 @@ public class Story2Xliff {
 			return true;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			if (hasText(it.next())) {
+		for (Element child : children) {
+			if (hasText(child)) {
 				return true;
 			}
 		}

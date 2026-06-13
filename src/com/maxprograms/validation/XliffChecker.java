@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -978,9 +977,7 @@ public class XliffChecker {
 		if (e.getLocalName().equals("source") || e.getLocalName().equals("seg-source")
 				|| e.getLocalName().equals("target")) {
 			Set<String> keys = bxTable.keySet();
-			Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : keys) {
 				if (exTable.containsKey(key)) {
 					exTable.remove(key);
 					bxTable.remove(key);
@@ -993,9 +990,7 @@ public class XliffChecker {
 				return false;
 			}
 			keys = bptTable.keySet();
-			it = keys.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : keys) {
 				if (eptTable.containsKey(key)) {
 					eptTable.remove(key);
 					bptTable.remove(key);
@@ -1018,9 +1013,8 @@ public class XliffChecker {
 		// check for missing <trans-unit> referenced in <sub>
 		if (e.getLocalName().equals("file")) {
 			Set<String> keys = xids.keySet();
-			Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				if (!ids.containsKey(it.next())) {
+			for (String key : keys) {
+				if (!ids.containsKey(key)) {
 					reason = Messages.getString("XliffChecker.40");
 					return false;
 				}

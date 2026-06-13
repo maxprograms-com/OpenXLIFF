@@ -121,9 +121,7 @@ public class RepetitionAnalysis {
 
 	private void createList(Element root) {
 		List<Element> elements = root.getChildren();
-		Iterator<Element> it = elements.iterator();
-		while (it.hasNext()) {
-			Element el = it.next();
+		for (Element el : elements) {
 			if (el.getName().equals("file")) {
 				String originalFile = el.getAttributeValue("original");
 				srcLang = el.getAttributeValue("source-language");
@@ -724,9 +722,7 @@ public class RepetitionAnalysis {
 		List<Element> altTrans = e.getChildren("alt-trans");
 		int max = 0;
 		String type = "";
-		Iterator<Element> i = altTrans.iterator();
-		while (i.hasNext()) {
-			Element trans = i.next();
+		for (Element trans : altTrans) {
 			String quality = trans.getAttributeValue("match-quality");
 			try {
 				Integer value = Integer.parseInt(quality);
@@ -759,9 +755,7 @@ public class RepetitionAnalysis {
 		}
 		StringBuilder text = new StringBuilder();
 		List<XMLNode> content = src.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE
 					&& src.getAttributeValue("mtype", "translatable").equals(translate)) {
 				if (space.equals("default")) {
@@ -902,10 +896,8 @@ public class RepetitionAnalysis {
 		List<Element> segs = new ArrayList<>();
 		createList(rootClone, segs);
 
-		it = segs.iterator();
 		List<Element> srcs = new ArrayList<>();
-		while (it.hasNext()) {
-			Element e = it.next();
+		for (Element e : segs) {
 			String approved = e.getAttributeValue("approved", "no");
 			Element src = e.getChild("source");
 			src = removeTags(src);
@@ -1031,9 +1023,7 @@ public class RepetitionAnalysis {
 
 	private static void createList(Element root, List<Element> segs) {
 		List<Element> elements = root.getChildren();
-		Iterator<Element> it = elements.iterator();
-		while (it.hasNext()) {
-			Element el = it.next();
+		for (Element el : elements) {
 			if (el.getName().equals("trans-unit")) {
 				if (el.getAttributeValue("translate", "yes").equalsIgnoreCase("yes")) {
 					segs.add(el);

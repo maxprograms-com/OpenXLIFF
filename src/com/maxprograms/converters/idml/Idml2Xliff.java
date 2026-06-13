@@ -20,7 +20,6 @@ import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -101,17 +100,14 @@ public class Idml2Xliff {
 			table.put(key, i);
 		}
 		List<XMLNode> v = new Vector<>();
-		Iterator<String> it = used.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : used) {
 			if (table.containsKey(key)) {
 				v.add(files.get(table.get(key).intValue()));
 			}
 		}
 		mergedRoot.setContent(v);
-		Iterator<PI> pit = instructions.iterator();
-		while (pit.hasNext()) {
-			mergedRoot.addContent(pit.next());
+		for (PI pi : instructions) {
+			mergedRoot.addContent(pi);
 		}
 	}
 
@@ -133,9 +129,8 @@ public class Idml2Xliff {
 		Document doc = builder.build(map);
 		Element root = doc.getRootElement();
 		List<Element> stories = root.getChildren("idPkg:Story");
-		Iterator<Element> it = stories.iterator();
-		while (it.hasNext()) {
-			result.add(it.next().getAttributeValue("src"));
+		for (Element story : stories) {
+			result.add(story.getAttributeValue("src"));
 		}
 		return result;
 	}

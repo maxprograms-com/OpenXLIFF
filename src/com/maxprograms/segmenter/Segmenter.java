@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -147,9 +146,7 @@ public class Segmenter {
 	private String hideTags(String string, Map<String, String> tags) {
 		String result = string;
 		Set<String> keys = tags.keySet();
-		Iterator<String> it = keys.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : keys) {
 			int index = result.indexOf(key);
 			if (index != -1) {
 				result = result.substring(0, index) + result.substring(index + 1);
@@ -278,9 +275,7 @@ public class Segmenter {
 	private String cleanup(String string, Map<String, String> tags) {
 		String result = string;
 		Set<String> keys = tags.keySet();
-		Iterator<String> it = keys.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : keys) {
 			int index = result.indexOf(key);
 			if (index != -1) {
 				result = result.substring(0, index) + tags.get(key) + result.substring(index + 1);
@@ -292,9 +287,7 @@ public class Segmenter {
 	private void buildRulesList(String srcLanguage) {
 		List<String> maps = new ArrayList<>();
 		List<Element> allMaps = root.getChild("body").getChild("maprules").getChildren("languagemap");
-		Iterator<Element> it = allMaps.iterator();
-		while (it.hasNext()) {
-			Element map = it.next();
+		for (Element map : allMaps) {
 			if (srcLanguage.matches(map.getAttributeValue("languagepattern"))) {
 				maps.add(map.getAttributeValue("languagerulename"));
 				if (!cascade) {
@@ -304,15 +297,12 @@ public class Segmenter {
 		}
 		rules = new ArrayList<>();
 		List<Element> languageRules = root.getChild("body").getChild("languagerules").getChildren("languagerule");
-		it = languageRules.iterator();
-		while (it.hasNext()) {
-			Element languagerule = it.next();
+		for (Element languagerule : languageRules) {
 			String name = languagerule.getAttributeValue("languagerulename");
 			if (maps.contains(name)) {
 				List<Element> ruleset = languagerule.getChildren("rule");
-				Iterator<Element> rit = ruleset.iterator();
-				while (rit.hasNext()) {
-					rules.add(rit.next());
+				for (Element rule : ruleset) {
+					rules.add(rule);
 				}
 			}
 		}
@@ -408,9 +398,7 @@ public class Segmenter {
 	private String pureText(Element e, Map<String, String> tags, int[] tagId) {
 		StringBuilder result = new StringBuilder();
 		List<XMLNode> nodes = e.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				result.append(((TextNode) n).getText());
 			}

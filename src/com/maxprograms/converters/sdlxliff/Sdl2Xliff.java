@@ -19,10 +19,8 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -43,7 +41,7 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Sdl2Xliff {
 
-	private static final List<String> CONTEXT_TYPES = Arrays.asList("database", "element", "elementtitle", "linenumber",
+	private static final List<String> CONTEXT_TYPES = List.of("database", "element", "elementtitle", "linenumber",
 			"numparams", "paramnotes", "record", "recordtitle", "sourceFile");
 
 	private Sdl2Xliff() {
@@ -161,9 +159,8 @@ public class Sdl2Xliff {
 			processUnit(root, out, contextMap, new Vector<>());
 		} else {
 			List<Element> children = root.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				recurse(it.next(), out, contextMap);
+			for (Element child : children) {
+				recurse(child, out, contextMap);
 			}
 		}
 	}
@@ -184,9 +181,7 @@ public class Sdl2Xliff {
 		Element segDefs = unit.getChild("sdl:seg-defs");
 		if (segDefs != null) {
 			List<Element> children = segDefs.getChildren("sdl:seg");
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				Element sdlSeg = it.next();
+			for (Element sdlSeg : children) {
 				String id = sdlSeg.getAttributeValue("id");
 				if ("true".equals(sdlSeg.getAttributeValue("locked", "false"))) {
 					lockedMap.put(id, true);
@@ -210,17 +205,13 @@ public class Sdl2Xliff {
 				Map<String, Element> targets = new HashMap<>();
 				if (target != null) {
 					List<Element> tmarks = getSegments(target);
-					Iterator<Element> tt = tmarks.iterator();
-					while (tt.hasNext()) {
-						Element mrk = tt.next();
+					for (Element mrk : tmarks) {
 						targets.put(mrk.getAttributeValue("mid"), mrk);
 					}
 				}
 				List<Element> mrks = getSegments(segSource);
 				if (!mrks.isEmpty()) {
-					Iterator<Element> it = mrks.iterator();
-					while (it.hasNext()) {
-						Element mrk = it.next();
+					for (Element mrk : mrks) {
 						String id = mrk.getAttributeValue("mid");
 						String lockedString = "";
 						if (lockedMap.containsKey(id)) {
@@ -272,10 +263,8 @@ public class Sdl2Xliff {
 	}
 
 	private static boolean containsSrcText(Element child) {
-		List<XMLNode> list = child.getContent();
-		Iterator<XMLNode> it = list.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		List<XMLNode> content = child.getContent();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				if (!n.toString().trim().isEmpty()) {
 					return true;
@@ -292,9 +281,7 @@ public class Sdl2Xliff {
 
 	private static void recurseTarget(Element mrk, FileOutputStream out) throws IOException {
 		List<XMLNode> tnodes = mrk.getContent();
-		Iterator<XMLNode> tnt = tnodes.iterator();
-		while (tnt.hasNext()) {
-			XMLNode n = tnt.next();
+		for (XMLNode n : tnodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeStr(out, n.toString());
 			}
@@ -311,9 +298,7 @@ public class Sdl2Xliff {
 
 	private static void recurseSource(Element mrk, FileOutputStream out) throws IOException {
 		List<XMLNode> nodes = mrk.getContent();
-		Iterator<XMLNode> nt = nodes.iterator();
-		while (nt.hasNext()) {
-			XMLNode n = nt.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeStr(out, n.toString());
 			}
@@ -332,9 +317,7 @@ public class Sdl2Xliff {
 	private static List<Element> getSegments(Element e) {
 		List<Element> result = new ArrayList<>();
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			if (child.getName().equals("mrk") && child.getAttributeValue("mtype").equals("seg")) {
 				result.add(child);
 			} else {
@@ -346,9 +329,7 @@ public class Sdl2Xliff {
 
 	private static boolean containsText(Element source) {
 		List<XMLNode> nodes = source.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE && !n.toString().trim().isEmpty()) {
 				return true;
 			}
@@ -374,9 +355,7 @@ public class Sdl2Xliff {
 		if (!children.isEmpty()) {
 			List<XMLNode> content = e.getContent();
 			List<XMLNode> newContent = new ArrayList<>();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 					Element child = (Element) n;
 					if (child.getName().equals("mrk")) {
@@ -398,9 +377,8 @@ public class Sdl2Xliff {
 			e.setContent(newContent);
 		}
 		children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			acceptTrackedChanges(it.next());
+		for (Element child : children) {
+			acceptTrackedChanges(child);
 		}
 	}
 }

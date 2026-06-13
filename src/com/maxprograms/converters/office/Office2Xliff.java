@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -84,7 +83,7 @@ public class Office2Xliff {
 					try (ZipOutputStream out = new ZipOutputStream(new FileOutputStream(skeleton))) {
 						ZipEntry entry = null;
 						while ((entry = in.getNextEntry()) != null) {
-							if (entry.getName().matches(".*\\.[xX][mM][lL]") 
+							if (entry.getName().matches(".*\\.[xX][mM][lL]")
 									&& !(entry.getName().matches(".*slideMaster.*")
 											|| entry.getName().matches(".*slideLayout.*")
 											|| entry.getName().matches(".*handoutMaster.*")
@@ -226,9 +225,7 @@ public class Office2Xliff {
 		if (!e.getChildren("text:s").isEmpty()) {
 			List<XMLNode> newContent = new ArrayList<>();
 			List<XMLNode> content = e.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 					Element e1 = (Element) n;
 					if (e1.getName().equals("text:s")) {
@@ -243,9 +240,8 @@ public class Office2Xliff {
 			e.setContent(newContent);
 		} else {
 			List<Element> list = e.getChildren();
-			Iterator<Element> it = list.iterator();
-			while (it.hasNext()) {
-				recurseCleaning(it.next());
+			for (Element child : list) {
+				recurseCleaning(child);
 			}
 		}
 	}
@@ -261,15 +257,12 @@ public class Office2Xliff {
 			table.put(key, "" + i);
 		}
 		List<XMLNode> v = new ArrayList<>();
-		Iterator<String> it = tree.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : tree) {
 			v.add(files.get(Integer.parseInt(table.get(key))));
 		}
 		mergedRoot.setContent(v);
-		Iterator<PI> pit = instructions.iterator();
-		while (pit.hasNext()) {
-			mergedRoot.addContent(pit.next());
+		for (PI pi : instructions) {
+			mergedRoot.addContent(pi);
 		}
 	}
 

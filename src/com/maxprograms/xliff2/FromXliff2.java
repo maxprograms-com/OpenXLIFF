@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -171,9 +170,7 @@ public class FromXliff2 {
 				file.setAttribute("target-language", trgLang);
 			}
 			List<Attribute> atts = source.getAttributes();
-			Iterator<Attribute> at = atts.iterator();
-			while (at.hasNext()) {
-				Attribute a = at.next();
+			for (Attribute a : atts) {
 				if (a.getName().startsWith("xmlns:")) {
 					file.setAttribute(a);
 				}
@@ -215,25 +212,19 @@ public class FromXliff2 {
 						Element tool = new Element("tool");
 						header.addContent(tool);
 						List<Element> metaList = metaGroup.getChildren("mda:meta");
-						Iterator<Element> it = metaList.iterator();
-						while (it.hasNext()) {
-							Element meta = it.next();
+						for (Element meta : metaList) {
 							tool.setAttribute(meta.getAttributeValue("type"), meta.getText());
 						}
 						file.setAttribute("tool-id", tool.getAttributeValue("tool-id"));
 					} else if (category.equals("PI")) {
 						List<Element> metaList = metaGroup.getChildren("mda:meta");
-						Iterator<Element> it = metaList.iterator();
-						while (it.hasNext()) {
-							Element meta = it.next();
+						for (Element meta : metaList) {
 							PI pi = new PI(meta.getAttributeValue("type"), meta.getText());
 							file.addContent(pi);
 						}
 					} else if (category.equals("project-data")) {
 						List<Element> metaList = metaGroup.getChildren("mda:meta");
-						Iterator<Element> it = metaList.iterator();
-						while (it.hasNext()) {
-							Element meta = it.next();
+						for (Element meta : metaList) {
 							String type = meta.getAttributeValue("type");
 							if (type.equals("product-name")) {
 								file.setAttribute("product-name", meta.getText());
@@ -249,9 +240,7 @@ public class FromXliff2 {
 							|| category.equals("sourceFile")) {
 						JSONObject obj = new JSONObject();
 						List<Element> metaList = metaGroup.getChildren("mda:meta");
-						Iterator<Element> it = metaList.iterator();
-						while (it.hasNext()) {
-							Element meta = it.next();
+						for (Element meta : metaList) {
 							String type = meta.getAttributeValue("type");
 							obj.put(type, meta.getText());
 						}
@@ -286,9 +275,7 @@ public class FromXliff2 {
 				Element metaGroup = metadata.getChild("mda:metaGroup");
 				if (metaGroup != null) {
 					List<Element> metaList = metaGroup.getChildren("mda:meta");
-					Iterator<Element> it = metaList.iterator();
-					while (it.hasNext()) {
-						Element meta = it.next();
+					for (Element meta : metaList) {
 						if (meta.getAttributeValue("type").equals("ts")) {
 							group.setAttribute("ts", meta.getText());
 						}
@@ -309,9 +296,7 @@ public class FromXliff2 {
 				transUnit.setAttribute("translate", "no");
 			}
 			List<Attribute> atts = source.getAttributes();
-			Iterator<Attribute> at = atts.iterator();
-			while (at.hasNext()) {
-				Attribute a = at.next();
+			for (Attribute a : atts) {
 				if (a.getName().indexOf(':') != -1 && !a.getName().startsWith("xml:")) {
 					transUnit.setAttribute(a);
 				}
@@ -327,9 +312,7 @@ public class FromXliff2 {
 			Element originalData = source.getChild("originalData");
 			if (originalData != null) {
 				List<Element> dataList = originalData.getChildren("data");
-				Iterator<Element> it = dataList.iterator();
-				while (it.hasNext()) {
-					Element data = it.next();
+				for (Element data : dataList) {
 					tags.put(data.getAttributeValue("id"), data.getText());
 				}
 			}
@@ -338,23 +321,19 @@ public class FromXliff2 {
 			Element metadata = source.getChild("mda:metadata");
 			if (metadata != null) {
 				List<Element> groups = metadata.getChildren("mda:metaGroup");
-				Iterator<Element> it = groups.iterator();
-				while (it.hasNext()) {
-					Element group = it.next();
+				for (Element group : groups) {
 					if ("attributes".equals(group.getAttributeValue("category"))) {
 						String id = group.getAttributeValue("id");
 						List<String[]> list = new ArrayList<>();
 						List<Element> metas = group.getChildren("mda:meta");
-						for (int i = 0; i < metas.size(); i++) {
-							Element meta = metas.get(i);
+						for (Element meta : metas) {
 							list.add(new String[] { meta.getAttributeValue("type"), meta.getText() });
 						}
 						attributes.put(id, list);
 					}
 					if ("transUnitAttributes".equals(group.getAttributeValue("category"))) {
 						List<Element> metas = group.getChildren("mda:meta");
-						for (int i = 0; i < metas.size(); i++) {
-							Element meta = metas.get(i);
+						for (Element meta : metas) {
 							transUnit.setAttribute(meta.getAttributeValue("type"), meta.getText());
 						}
 					}
@@ -368,9 +347,7 @@ public class FromXliff2 {
 			boolean hasTarget = false;
 
 			List<Element> children = source.getChildren();
-			Iterator<Element> et = children.iterator();
-			while (et.hasNext()) {
-				Element child = et.next();
+			for (Element child : children) {
 				if (child.getName().equals("segment") || child.getName().equals("ignorable")) {
 					Element src = child.getChild("source");
 					if (src.getAttributeValue("xml:space", "default").equals("preserve")) {
@@ -421,8 +398,7 @@ public class FromXliff2 {
 			Element notes = source.getChild("notes");
 			if (notes != null) {
 				List<Element> notesList = notes.getChildren("note");
-				for (int i = 0; i < notesList.size(); i++) {
-					Element note = notesList.get(i);
+				for (Element note : notesList) {
 					Element n = new Element("note");
 					String appliesTo = note.getAttributeValue("appliesTo");
 					if (!appliesTo.isEmpty()) {
@@ -439,8 +415,7 @@ public class FromXliff2 {
 			Element matches = source.getChild("mtc:matches");
 			if (matches != null) {
 				List<Element> matchesList = matches.getChildren("mtc:match");
-				for (int i = 0; i < matchesList.size(); i++) {
-					Element match = matchesList.get(i);
+				for (Element match : matchesList) {
 					Element altTrans = new Element("alt-trans");
 					String quality = match.getAttributeValue("matchQuality");
 					if (!quality.isEmpty()) {
@@ -456,9 +431,7 @@ public class FromXliff2 {
 					Element matchData = match.getChild("originalData");
 					if (matchData != null) {
 						List<Element> dataList = matchData.getChildren("data");
-						Iterator<Element> it = dataList.iterator();
-						while (it.hasNext()) {
-							Element data = it.next();
+						for (Element data : dataList) {
 							if (!tags.containsKey(data.getAttributeValue("id"))) {
 								tags.put(data.getAttributeValue("id"), data.getText());
 							}
@@ -485,9 +458,8 @@ public class FromXliff2 {
 		}
 
 		List<Element> children = source.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			recurse(it.next(), target);
+		for (Element child : children) {
+			recurse(child, target);
 		}
 	}
 
@@ -497,9 +469,7 @@ public class FromXliff2 {
 		}
 		List<XMLNode> newContent = new Vector<>();
 		List<XMLNode> content = element.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				newContent.add(node);
 			}
@@ -507,9 +477,7 @@ public class FromXliff2 {
 				Element child = (Element) node;
 				if (containsComments(child)) {
 					List<XMLNode> nodes = child.getContent();
-					Iterator<XMLNode> nt = nodes.iterator();
-					while (nt.hasNext()) {
-						XMLNode n = nt.next();
+					for (XMLNode n : nodes) {
 						if (n.getNodeType() == XMLNode.TEXT_NODE) {
 							newContent.add(n);
 						}
@@ -532,9 +500,7 @@ public class FromXliff2 {
 			return true;
 		}
 		List<Element> children = element.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			if (containsComments(child)) {
 				return true;
 			}
@@ -550,9 +516,7 @@ public class FromXliff2 {
 			Map<String, List<String[]>> attributes) {
 		List<XMLNode> result = new ArrayList<>();
 		List<XMLNode> nodes = joinedSource.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : nodes) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				result.add(node);
 			}

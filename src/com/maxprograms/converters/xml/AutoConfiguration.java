@@ -14,7 +14,6 @@ package com.maxprograms.converters.xml;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -53,10 +52,8 @@ public class AutoConfiguration {
 		Document doc = new Document(null, "ini-file", "-//Maxprograms//Converters 2.0.0//EN", "configuration.dtd");
 		Element root = doc.getRootElement();
 		Set<String> keys = segment.keySet();
-		Iterator<String> it = keys.iterator();
-		while (it.hasNext()) {
+		for (String key : keys) {
 			Element e = new Element("tag");
-			String key = it.next();
 			e.setText(key);
 			e.setAttribute("hard-break", "segment");
 			root.addContent(e);
@@ -72,9 +69,7 @@ public class AutoConfiguration {
 	private static void recurse(Element r) {
 		StringBuilder text = new StringBuilder();
 		List<XMLNode> content = r.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				text.append(((TextNode) n).getText().trim());
 			}

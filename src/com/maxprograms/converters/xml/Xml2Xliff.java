@@ -26,7 +26,6 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -281,9 +280,7 @@ public class Xml2Xliff {
 		entitiesMap = "";
 		if (map != null) {
 			Set<String> en = entities.keySet();
-			Iterator<String> it = en.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : en) {
 				entitiesMap = entitiesMap + "      <prop prop-type=\"" + key.substring(1, key.length() - 1) + "\">"
 						+ cleanEntity(entities.get(key)) + "</prop>\n";
 			}
@@ -329,9 +326,8 @@ public class Xml2Xliff {
 				}
 			}
 			List<Element> list = ditaCache.getRootElement().getChildren();
-			Iterator<Element> it = list.iterator();
-			while (it.hasNext()) {
-				if (rootElement.equals(it.next().getText().trim())) {
+			for (Element item : list) {
+				if (rootElement.equals(item.getText().trim())) {
 					return base.getAbsolutePath();
 				}
 			}
@@ -343,9 +339,8 @@ public class Xml2Xliff {
 					continue;
 				}
 				String code = part.substring(part.indexOf('/') + 1).trim();
-				it = list.iterator();
-				while (it.hasNext()) {
-					if (code.equals(it.next().getText().trim())) {
+				for (Element item : list) {
+					if (code.equals(item.getText().trim())) {
 						return base.getAbsolutePath();
 					}
 				}
@@ -611,9 +606,7 @@ public class Xml2Xliff {
 
 		StringBuilder result = new StringBuilder();
 		List<XMLNode> content = element.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			switch (n.getNodeType()) {
 				case XMLNode.ELEMENT_NODE:
 					Element e = (Element) n;
@@ -655,9 +648,7 @@ public class Xml2Xliff {
 		}
 		StringBuilder content = new StringBuilder();
 		List<XMLNode> nodes = element.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			switch (n.getNodeType()) {
 				case XMLNode.ELEMENT_NODE:
 					Element e = (Element) n;
@@ -864,9 +855,7 @@ public class Xml2Xliff {
 			return false;
 		}
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				String nodeText = ((TextNode) node).getText().strip();
 				for (int i = 0; i < nodeText.length(); i++) {
@@ -1150,9 +1139,7 @@ public class Xml2Xliff {
 		keepFormating = new HashMap<>();
 		inline = new HashMap<>();
 
-		Iterator<Element> i = tags.iterator();
-		while (i.hasNext()) {
-			Element t = i.next();
+		for (Element t : tags) {
 			if (t.getAttributeValue("hard-break", "inline").equals("yes")
 					|| t.getAttributeValue("hard-break", "inline").equals("segment")) {
 				startsSegment.put(t.getText(), "yes");
@@ -1415,10 +1402,9 @@ public class Xml2Xliff {
 		StringBuilder sb = new StringBuilder("<");
 		sb.append(e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> at = atts.iterator();
-		while (at.hasNext()) {
+		for (Attribute at : atts) {
 			sb.append(' ');
-			sb.append(at.next().toString());
+			sb.append(at.toString());
 		}
 		sb.append(">");
 		Element mrk = new Element("mrk");
@@ -1429,9 +1415,7 @@ public class Xml2Xliff {
 		}
 		mrk.setAttribute("mtype", type);
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				mrk.addContent(node);
 			}
@@ -1490,9 +1474,7 @@ public class Xml2Xliff {
 	private void removeComments(Element e) {
 		List<XMLNode> content = new ArrayList<>();
 		List<XMLNode> list = e.getContent();
-		Iterator<XMLNode> it = list.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : list) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				content.add(n);
 			}
@@ -1505,10 +1487,8 @@ public class Xml2Xliff {
 
 	private void normalizeElement(Element e) {
 		List<XMLNode> l = e.getContent();
-		Iterator<XMLNode> i = l.iterator();
 		List<XMLNode> normal = new ArrayList<>();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : l) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				String value = ((TextNode) n).getText();
 				value = normalize(value);

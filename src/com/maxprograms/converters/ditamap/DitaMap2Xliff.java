@@ -27,7 +27,6 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -509,9 +508,8 @@ public class DitaMap2Xliff {
 			}
 		} else {
 			List<Element> children = root.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				fixXref(it.next(), source, doc, catalog, context);
+			for (Element file : children) {
+				fixXref(file, source, doc, catalog, context);
 			}
 		}
 	}
@@ -521,9 +519,7 @@ public class DitaMap2Xliff {
 		Element referenced = getReferenced(file, id, catalog);
 		if (referenced != null) {
 			List<Element> children = referenced.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				Element child = it.next();
+			for (Element child : children) {
 				if (DitaParser.ditaClass(child, "topic/title")) {
 					return child.getTextNormalize();
 				}
@@ -618,9 +614,8 @@ public class DitaMap2Xliff {
 						e.setAttribute("removeTranslate", "yes");
 					}
 					List<Element> children = e.getChildren();
-					Iterator<Element> its = children.iterator();
-					while (its.hasNext()) {
-						fixConKeyRef(its.next(), file, doc, catalog, context);
+					for (Element child : children) {
+						fixConKeyRef(child, file, doc, catalog, context);
 					}
 				} else {
 					MessageFormat mf = new MessageFormat(Messages.getString("DitaMap2Xliff.07"));
@@ -732,9 +727,8 @@ public class DitaMap2Xliff {
 							}
 						}
 						List<Element> children = e.getChildren();
-						Iterator<Element> it = children.iterator();
-						while (it.hasNext()) {
-							fixConKeyRef(it.next(), href, d, catalog, context);
+						for (Element child : children) {
+							fixConKeyRef(child, href, d, catalog, context);
 						}
 					} catch (Exception _) {
 						// do nothing
@@ -743,9 +737,8 @@ public class DitaMap2Xliff {
 			}
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				fixConKeyRef(it.next(), source, doc, catalog, context);
+			for (Element child : children) {
+				fixConKeyRef(child, source, doc, catalog, context);
 			}
 		}
 	}
@@ -801,9 +794,7 @@ public class DitaMap2Xliff {
 			return root;
 		}
 		List<Element> children = root.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			Element result = locateReferenced(child, id);
 			if (result != null) {
 				return result;
@@ -883,17 +874,15 @@ public class DitaMap2Xliff {
 						e.setAttribute("removeTranslate", "yes");
 					}
 					List<Element> children = e.getChildren();
-					Iterator<Element> its = children.iterator();
-					while (its.hasNext()) {
-						fixConref(its.next(), file, doc, catalog, context);
+					for (Element child : children) {
+						fixConref(child, file, doc, catalog, context);
 					}
 				}
 			}
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				fixConref(it.next(), source, doc, catalog, context);
+			for (Element child : children) {
+				fixConref(child, source, doc, catalog, context);
 			}
 		}
 	}
@@ -918,9 +907,7 @@ public class DitaMap2Xliff {
 			return root;
 		}
 		List<Element> children = root.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element child = it.next();
+		for (Element child : children) {
 			Element result = locate(child, topicId, id);
 			if (result != null) {
 				return result;
@@ -1004,11 +991,9 @@ public class DitaMap2Xliff {
 		Element root = doc.getRootElement();
 		if (root.getName().equals("val")) {
 			List<Element> props = root.getChildren("prop");
-			Iterator<Element> it = props.iterator();
 			excludeTable = new HashMap<>();
 			includeTable = new HashMap<>();
-			while (it.hasNext()) {
-				Element prop = it.next();
+			for (Element prop : props) {
 				if (prop.getAttributeValue("action", "include").equals("exclude")) {
 					String att = prop.getAttributeValue("att");
 					String val = prop.getAttributeValue("val");
@@ -1043,9 +1028,7 @@ public class DitaMap2Xliff {
 	private static boolean filterOut(Element e) {
 		if (filterAttributes) {
 			List<Attribute> atts = e.getAttributes();
-			Iterator<Attribute> it = atts.iterator();
-			while (it.hasNext()) {
-				Attribute a = it.next();
+			for (Attribute a : atts) {
 				if (excludeTable.containsKey(a.getName())) {
 					Set<String> forbidden = excludeTable.get(a.getName());
 					if (forbidden.isEmpty() && includeTable.containsKey(a.getName())) {

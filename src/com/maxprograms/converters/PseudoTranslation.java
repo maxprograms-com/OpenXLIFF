@@ -18,7 +18,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -161,18 +160,15 @@ public class PseudoTranslation {
             }
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse(it.next());
+        for (Element child : children) {
+            recurse(child);
         }
     }
 
     private static void addTarget(Element root) {
         List<XMLNode> newContent = new Vector<>();
         List<XMLNode> content = root.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                 newContent.add(node);
                 if ("source".equals(((Element) node).getName())) {
@@ -188,9 +184,7 @@ public class PseudoTranslation {
     private static Element translate(Element source) {
         Element target = new Element("target");
         List<XMLNode> content = source.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 String text = ((TextNode) node).getText();
                 target.addContent(replace(text));

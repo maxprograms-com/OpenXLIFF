@@ -22,10 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -244,7 +242,7 @@ public class Convert {
 			}
 		}
 		String[] encodings = EncodingResolver.getPageCodes();
-		if (!Arrays.asList(encodings).contains(enc)) {
+		if (!List.of(encodings).contains(enc)) {
 			logger.log(Level.ERROR, Messages.getString("Convert.10"));
 			return;
 		}
@@ -392,10 +390,8 @@ public class Convert {
 			Document doc = builder.build(fileName);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
 			Set<String> deleted = new HashSet<>();
-			while (it.hasNext()) {
-				Element file = it.next();
+			for (Element file : files) {
 				Element header = file.getChild("header");
 				Element skl = header.getChild("skl");
 				Element external = skl.getChild("external-file");
@@ -523,9 +519,8 @@ public class Convert {
 	private static void listCharsets() {
 		SortedMap<String, Charset> available = Charset.availableCharsets();
 		Set<String> keySet = available.keySet();
-		Iterator<String> it = keySet.iterator();
-		while (it.hasNext()) {
-			Charset charset = available.get(it.next());
+		for (String key : keySet) {
+			Charset charset = available.get(key);
 			System.out.println(charset.displayName());
 		}
 	}

@@ -20,7 +20,6 @@ import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -366,9 +365,7 @@ public class Mif2Xliff {
 		charmap = new HashMap<>();
 		Element croot = cdoc.getRootElement();
 		List<Element> codes = croot.getChildren("char");
-		Iterator<Element> it = codes.iterator();
-		while (it.hasNext()) {
-			Element e = it.next();
+		for (Element e : codes) {
 			charmap.put(e.getAttributeValue("code"), e.getText());
 		}
 	}

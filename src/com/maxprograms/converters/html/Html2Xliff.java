@@ -21,9 +21,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -58,7 +56,7 @@ public class Html2Xliff {
 	private static int tagId;
 
 	private static List<String> segments;
-	private static List<String> startsSegment = Arrays.asList("address", "article", "aside", "blockquote", "br",
+	private static List<String> startsSegment = List.of("address", "article", "aside", "blockquote", "br",
 			"details", "dialog", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1",
 			"h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "html", "label", "li", "main", "meta", "nav", "ol",
 			"p", "pre", "script", "section", "table", "td", "tr", "ul");
@@ -312,10 +310,8 @@ public class Html2Xliff {
 		Document d = builder.build(stream);
 		Element e = d.getRootElement();
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
 		int count = 0;
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				count++;
 			}
@@ -356,10 +352,8 @@ public class Html2Xliff {
 		Document d = builder.build(stream);
 		Element e = d.getRootElement();
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
 		String result = "";
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				result = result + ((Element) n).getText();
 			}
@@ -376,10 +370,8 @@ public class Html2Xliff {
 		Document d = builder.build(stream);
 		Element e = d.getRootElement();
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
 		String result = "";
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				result = result + ((TextNode) n).getText();
 			}
@@ -769,7 +761,7 @@ public class Html2Xliff {
 						"author".equalsIgnoreCase(name.getValue())
 						|| "description".equalsIgnoreCase(name.getValue())
 						|| "keywords".equalsIgnoreCase(name.getValue())) {
-					translatableAttributes.put("meta", Arrays.asList("content"));
+					translatableAttributes.put("meta", List.of("content"));
 				} else {
 					translatableAttributes.remove("meta");
 				}
@@ -904,9 +896,7 @@ public class Html2Xliff {
 		Document doc = builder.build(Html2Xliff.class.getResource("entities.xml"));
 		Element root = doc.getRootElement();
 		List<Element> ents = root.getChildren("entity");
-		Iterator<Element> it = ents.iterator();
-		while (it.hasNext()) {
-			Element e = it.next();
+		for (Element e : ents) {
 			entities.put("&" + e.getAttributeValue("name") + ";", e.getText());
 		}
 	}

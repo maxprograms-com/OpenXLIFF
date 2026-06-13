@@ -11,9 +11,7 @@
  *******************************************************************************/
 package com.maxprograms.converters.ditamap;
 
-import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +30,7 @@ public class Scope {
 	public Scope(String name) {
 		names = new ConcurrentSkipListSet<>();
 		String[] parts = name.split("\\s");
-		names.addAll(Arrays.asList(parts));
+		names.addAll(List.of(parts));
 		children = new Vector<>();
 		keys = new Hashtable<>();
 	}
@@ -41,9 +39,7 @@ public class Scope {
 		JSONObject json = new JSONObject();
 		json.put("names", names);
 		JSONArray childrenScopes = new JSONArray();
-		Iterator<Scope> it = children.iterator();
-		while (it.hasNext()) {
-			Scope child = it.next();
+		for (Scope child : children) {
 			JSONObject childJson = new JSONObject(child.toString());
 			childrenScopes.put(childJson);
 		}
@@ -53,9 +49,7 @@ public class Scope {
 	}
 
 	public Scope scopeForName(String name) {
-		Iterator<Scope> it = children.iterator();
-		while (it.hasNext()) {
-			Scope child = it.next();
+		for (Scope child : children) {
 			if (child.is(name)) {
 				return child;
 			}
@@ -90,18 +84,14 @@ public class Scope {
 					return keys.get(key);
 				}
 			} else {
-				Iterator<Scope> it = children.iterator();
-				while (it.hasNext()) {
-					Scope child = it.next();
+				for (Scope child : children) {
 					if (child.is(scope)) {
 						return child.getKey(key);
 					}
 				}
 			}
 		}
-		Iterator<Scope> it = children.iterator();
-		while (it.hasNext()) {
-			Scope child = it.next();
+		for (Scope child : children) {
 			Key k = child.getKey(string);
 			if (k != null) {
 				return k;
@@ -116,26 +106,19 @@ public class Scope {
 
 	public Map<String, Key> getKeys() {
 		Map<String, Key> result = new Hashtable<>();
-		Iterator<String> it = names.iterator();
-		while (it.hasNext()) {
-			String name = it.next();
+		for (String name : names) {
 			String prefix = "";
 			if (!name.isEmpty()) {
 				prefix = name + ".";
 			}
 			Set<String> keySet = keys.keySet();
-			Iterator<String> kit = keySet.iterator();
-			while (kit.hasNext()) {
-				String key = kit.next();
+			for (String key : keySet) {
 				result.put(prefix + key, keys.get(key));
 			}
-			Iterator<Scope> sc = children.iterator();
-			while (sc.hasNext()) {
-				Map<String, Key> table = sc.next().getKeys();
+			for (Scope child : children) {
+				Map<String, Key> table = child.getKeys();
 				Set<String> set = table.keySet();
-				Iterator<String> st = set.iterator();
-				while (st.hasNext()) {
-					String s = st.next();
+				for (String s : set) {
 					result.put(prefix + s, table.get(s));
 				}
 			}
