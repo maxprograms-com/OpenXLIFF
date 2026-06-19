@@ -57,6 +57,7 @@ public class FromOpenXliff {
     private static String currentFile;
     private static Map<String, Element> fileMetadata;
     private static Map<String, Element> unitMetadata;
+    private static int skeletonFileIndex;
 
     private FromOpenXliff() {
         // do not instantiate this class
@@ -111,6 +112,7 @@ public class FromOpenXliff {
             throws SAXException, IOException, ParserConfigurationException {
         String version = rootElement.getAttributeValue("version");
         if (version.startsWith("1")) {
+            skeletonFileIndex = 0;
             recurse1x(rootElement);
         }
         if (version.startsWith("2")) {
@@ -124,10 +126,11 @@ public class FromOpenXliff {
 
     private static void recurse1x(Element root) throws SAXException, IOException, ParserConfigurationException {
         if ("file".equals(root.getName())) {
+            skeletonFileIndex++;
             tgtLang = root.getAttributeValue("target-language");
-            String original = root.getAttributeValue("original");
-            if (fileMetadata.containsKey(original)) {
-                root.addContent(fileMetadata.get(original));
+            String fileKey = String.valueOf(skeletonFileIndex);
+            if (fileMetadata.containsKey(fileKey)) {
+                root.addContent(fileMetadata.get(fileKey));
             }
         }
         if ("trans-unit".equals(root.getName()) && !root.getAttributeValue("translate").equals("no")) {
@@ -376,8 +379,11 @@ public class FromOpenXliff {
                     if (obj.has("id")) {
                         // original was XLIFF 2.x
                         currentFile = obj.getString("id");
+                    } else if (obj.has("fileId")) {
+                        // original was XLIFF 1.x, new scheme (6.0+)
+                        currentFile = obj.getString("fileId");
                     } else if (obj.has("original")) {
-                        // original was XLIFF 1.x
+                        // original was XLIFF 1.x, old scheme
                         currentFile = obj.getString("original");
                     }
                 }
@@ -388,8 +394,11 @@ public class FromOpenXliff {
                     if (obj.has("id")) {
                         // original was XLIFF 2.x
                         currentFile = obj.getString("id");
+                    } else if (obj.has("fileId")) {
+                        // original was XLIFF 1.x, new scheme (6.0+)
+                        currentFile = obj.getString("fileId");
                     } else if (obj.has("original")) {
-                        // original was XLIFF 1.x
+                        // original was XLIFF 1.x, old scheme
                         currentFile = obj.getString("original");
                     }
                 }
@@ -470,7 +479,7 @@ public class FromOpenXliff {
     public static void restoreAttributes(Element e) {
         List<Attribute> atts = e.getAttributes();
         Vector<String> change = new Vector<>();
-        for (Attribute a:atts) {
+        for (Attribute a : atts) {
             if (a.getName().indexOf("__") != -1) {
                 change.add(a.getName());
             }

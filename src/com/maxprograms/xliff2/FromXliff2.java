@@ -175,9 +175,16 @@ public class FromXliff2 {
 					file.setAttribute(a);
 				}
 			}
+			String fileId = source.getAttributeValue("id");
 			List<PI> pis = source.getPI("ts");
 			if (!pis.isEmpty()) {
-				file.addContent(pis.get(0));
+				JSONObject obj = new JSONObject(pis.get(0).getData());
+				obj.put("fileId", fileId);
+				file.addContent(new PI("ts", obj.toString()));
+			} else {
+				JSONObject obj = new JSONObject();
+				obj.put("fileId", fileId);
+				file.addContent(new PI("ts", obj.toString()));
 			}
 			pis = source.getPI("metadata");
 			if (!pis.isEmpty()) {

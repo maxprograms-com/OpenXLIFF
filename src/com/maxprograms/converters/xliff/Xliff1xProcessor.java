@@ -24,8 +24,8 @@ import com.maxprograms.xml.XMLUtils;
 public class Xliff1xProcessor {
 
     private static int tag;
+    private static int fileIndex;
     private static boolean preserveSpaces = false;
-    private static String currentFile;
 
     private Xliff1xProcessor() {
         // do not instantiate this class
@@ -34,13 +34,14 @@ public class Xliff1xProcessor {
 
     public static void processXliff1x(Element root, List<Element> units) {
         tag = 1;
+        fileIndex = 0;
         preserveSpaces = false;
         recurse1x(root, units);
     }
 
     private static void recurse1x(Element root, List<Element> units) {
         if ("file".equals(root.getName())) {
-            currentFile = root.getAttributeValue("original");
+            fileIndex++;
         }
         if ("trans-unit".equals(root.getName()) && !root.getAttributeValue("translate").equals("no")) {
             Element segSource = root.getChild("seg-source");
@@ -75,7 +76,7 @@ public class Xliff1xProcessor {
                             }
                             unit.addContent(target);
                             units.add(unit);
-                            e.addContent(new PI(Constants.TOOLID, currentFile + "_" + unit.getAttributeValue("id")));
+                            e.addContent(new PI(Constants.TOOLID, fileIndex + "_" + unit.getAttributeValue("id")));
                         }
                     }
                 }
@@ -150,7 +151,7 @@ public class Xliff1xProcessor {
                     unit.addContent(group);
                 }   
                 units.add(unit);
-                root.addContent(new PI(Constants.TOOLID, currentFile + "_" + unit.getAttributeValue("id")));
+                root.addContent(new PI(Constants.TOOLID, fileIndex + "_" + unit.getAttributeValue("id")));
             }
             return;
         }
@@ -237,7 +238,7 @@ public class Xliff1xProcessor {
         for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode textNode = (TextNode) node;
-                sb.append(textNode.getText());
+                sb.append(XMLUtils.cleanText(textNode.getText()));
             }
             if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                 Element child = (Element) node;
