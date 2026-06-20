@@ -488,7 +488,21 @@ public class Convert {
 				params.put("generic", "yes");
 				result = Xml2Xliff.run(params);
 			} else if (format.equals(FileFormats.XLIFF)) {
-				result = ToOpenXliff.run(params);
+				boolean xliff2x = "yes".equals(params.get("xliff20")) || "yes".equals(params.get("xliff21"))
+						|| "yes".equals(params.get("xliff22"));
+				if (xliff2x && isOpenXliffIntermediate(params.get("source"), params.get("catalog"))) {
+					String ver = "2.0";
+					if ("yes".equals(params.get("xliff21")))
+						ver = "2.1";
+					if ("yes".equals(params.get("xliff22")))
+						ver = "2.2";
+					result = ToXliff2.run(params.get("source"), params.get("xliff"), params.get("catalog"), ver);
+					params.remove("xliff20");
+					params.remove("xliff21");
+					params.remove("xliff22");
+				} else {
+					result = ToOpenXliff.run(params);
+				}
 			} else {
 				result.add(Constants.ERROR);
 				result.add(Messages.getString("Convert.20"));
@@ -514,6 +528,32 @@ public class Convert {
 			result.add(1, e.getMessage());
 		}
 		return result;
+	}
+
+	private static boolean isOpenXliffIntermediate(String file, String catalog) {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			builder.setEntityResolver(CatalogBuilder.getCatalog(catalog));
+			Document doc = builder.build(file);
+			Element root = doc.getRootElement();
+			List<Element> files = root.getChildren("file");
+			if (!files.isEmpty()) {
+				Element firstFile = files.get(0);
+				if (Constants.TOOLID.equals(firstFile.getAttributeValue("tool-id"))) {
+					return true;
+				}
+				Element header = firstFile.getChild("header");
+				if (header != null) {
+					Element tool = header.getChild("tool");
+					if (tool != null) {
+						return Constants.TOOLID.equals(tool.getAttributeValue("tool-id"));
+					}
+				}
+			}
+		} catch (Exception _) {
+			// ignore
+		}
+		return false;
 	}
 
 	private static void listCharsets() {
