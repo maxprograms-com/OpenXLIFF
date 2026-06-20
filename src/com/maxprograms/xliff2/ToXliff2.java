@@ -49,6 +49,7 @@ public class ToXliff2 {
 	private static Element root2;
 	private static int fileId;
 	private static int mrkCount;
+	private static boolean xliffUpgrade = false;
 
 	private static List<String> preserveAttributes = List.of("reformat", "datatype", "ts", "phase-name",
 			"restype", "resname", "extradata", "help-id", "menu", "menu-option", "menu-name", "coord", "font",
@@ -114,17 +115,14 @@ public class ToXliff2 {
 			logger.log(Level.ERROR, Messages.getString("ToXliff2.6"));
 			return;
 		}
-		List<String> result = run(sourceFile, targetFile, catalog, version);
+		List<String> result = run(sourceFile, targetFile, catalog, version, Xliff2Utils.isOpenXliffIntermediate(sourceFile, catalog));
 		if (!result.get(0).equals(Constants.SUCCESS)) {
 			logger.log(Level.ERROR, result.get(1));
 		}
 	}
 
-	public static List<String> run(File xliffFile, String catalog, String version) {
-		return run(xliffFile.getAbsolutePath(), xliffFile.getAbsolutePath(), catalog, version);
-	}
-
-	public static List<String> run(String sourceFile, String outputFile, String catalog, String version) {
+	public static List<String> run(String sourceFile, String outputFile, String catalog, String version, boolean upgrade) {
+		xliffUpgrade = upgrade;
 		List<String> result = new ArrayList<>();
 		if (!List.of("2.0", "2.1", "2.2").contains(version)) {
 			result.add(Constants.ERROR);
@@ -352,6 +350,15 @@ public class ToXliff2 {
 				}
 			}
 
+			if (xliffUpgrade) {
+				Element upgradeGroup = new Element("mda:metaGroup");
+				upgradeGroup.setAttribute("category", "upgrade");
+				Element upgradeMeta = new Element("mda:meta");
+				upgradeMeta.setAttribute("type", "xliff-upgrade");
+				upgradeMeta.addContent("yes");
+				upgradeGroup.addContent(upgradeMeta);
+				fileMetadata.addContent(upgradeGroup);
+			}
 			if (!fileMetadata.getChildren().isEmpty()) {
 				file.addContent(fileMetadata);
 			}

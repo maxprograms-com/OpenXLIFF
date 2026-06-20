@@ -57,6 +57,7 @@ import com.maxprograms.converters.wpml.Xliff2Wpml;
 import com.maxprograms.converters.xliff.FromOpenXliff;
 import com.maxprograms.converters.xml.Xliff2Xml;
 import com.maxprograms.xliff2.FromXliff2;
+import com.maxprograms.xliff2.Xliff2Utils;
 import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
@@ -202,6 +203,11 @@ public class Merge {
 			loadXliff(xliff, catalog);
 			boolean unapproved = acceptUnaproved;
 			if (root.getAttributeValue("version").startsWith("2.")) {
+				if (Xliff2Utils.isXliffUpgrade(root)) {
+					FromXliff2.run(xliff, target, catalog);
+					result.add(Constants.SUCCESS);
+					return result;
+				}
 				File tmpXliff = File.createTempFile("temp", ".xlf", new File(xliff).getParentFile());
 				FromXliff2.run(xliff, tmpXliff.getAbsolutePath(), catalog);
 				loadXliff(tmpXliff.getAbsolutePath(), catalog);
@@ -586,10 +592,7 @@ public class Merge {
 		if (originals.size() == 1) {
 			if (file.endsWith(".xlf")) {
 				target = file.substring(0, file.length() - ".xlf".length());
-				if (target.indexOf('.') != -1) {
-					target = target.substring(0, target.lastIndexOf('.'))
-							+ "_" + tgtLanguage + target.substring(target.lastIndexOf('.'));
-				} else {
+				if (target.endsWith("_" + tgtLanguage) || target.indexOf('.') == -1) {
 					String original = originals.first();
 					if (original.indexOf('.') != -1) {
 						target = original.substring(0, original.lastIndexOf('.'))
@@ -597,6 +600,9 @@ public class Merge {
 					} else {
 						target = original + "_" + tgtLanguage;
 					}
+				} else {
+					target = target.substring(0, target.lastIndexOf('.'))
+							+ "_" + tgtLanguage + target.substring(target.lastIndexOf('.'));
 				}
 			} else {
 				if (target.indexOf('.') != -1) {

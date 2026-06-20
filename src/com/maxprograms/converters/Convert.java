@@ -63,6 +63,7 @@ import com.maxprograms.converters.xliff.ToOpenXliff;
 import com.maxprograms.converters.xml.Xml2Xliff;
 import com.maxprograms.xliff2.Resegmenter;
 import com.maxprograms.xliff2.ToXliff2;
+import com.maxprograms.xliff2.Xliff2Utils;
 import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
@@ -490,13 +491,13 @@ public class Convert {
 			} else if (format.equals(FileFormats.XLIFF)) {
 				boolean xliff2x = "yes".equals(params.get("xliff20")) || "yes".equals(params.get("xliff21"))
 						|| "yes".equals(params.get("xliff22"));
-				if (xliff2x && isOpenXliffIntermediate(params.get("source"), params.get("catalog"))) {
+				if (xliff2x && Xliff2Utils.isOpenXliffIntermediate(params.get("source"), params.get("catalog"))) {
 					String ver = "2.0";
 					if ("yes".equals(params.get("xliff21")))
 						ver = "2.1";
 					if ("yes".equals(params.get("xliff22")))
 						ver = "2.2";
-					result = ToXliff2.run(params.get("source"), params.get("xliff"), params.get("catalog"), ver);
+					result = ToXliff2.run(params.get("source"), params.get("xliff"), params.get("catalog"), ver, true);
 					params.remove("xliff20");
 					params.remove("xliff21");
 					params.remove("xliff22");
@@ -521,39 +522,13 @@ public class Convert {
 				if (xliff22) {
 					version = "2.2";
 				}
-				result = ToXliff2.run(new File(params.get("xliff")), params.get("catalog"), version);
+				result = ToXliff2.run(params.get("xliff"), params.get("xliff"), params.get("catalog"), version, false);
 			}
 		} catch (Exception e) {
 			result.add(0, Constants.ERROR);
 			result.add(1, e.getMessage());
 		}
 		return result;
-	}
-
-	private static boolean isOpenXliffIntermediate(String file, String catalog) {
-		try {
-			SAXBuilder builder = new SAXBuilder();
-			builder.setEntityResolver(CatalogBuilder.getCatalog(catalog));
-			Document doc = builder.build(file);
-			Element root = doc.getRootElement();
-			List<Element> files = root.getChildren("file");
-			if (!files.isEmpty()) {
-				Element firstFile = files.get(0);
-				if (Constants.TOOLID.equals(firstFile.getAttributeValue("tool-id"))) {
-					return true;
-				}
-				Element header = firstFile.getChild("header");
-				if (header != null) {
-					Element tool = header.getChild("tool");
-					if (tool != null) {
-						return Constants.TOOLID.equals(tool.getAttributeValue("tool-id"));
-					}
-				}
-			}
-		} catch (Exception _) {
-			// ignore
-		}
-		return false;
 	}
 
 	private static void listCharsets() {

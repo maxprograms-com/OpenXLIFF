@@ -125,7 +125,7 @@ public class ICEMatches {
             Files.delete(oldFile.toPath());
         }
         if (newFile.getName().startsWith("new__")) {
-            ToXliff2.run(newFile, catalogFile, version);
+            ToXliff2.run(newFile.getAbsolutePath(), newFile.getAbsolutePath(), catalogFile, version, false);
             Files.delete(new File(newXliff).toPath());
             Files.copy(newFile.toPath(), new File(newXliff).toPath());
             Files.delete(newFile.toPath());
