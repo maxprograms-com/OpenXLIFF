@@ -32,9 +32,12 @@ public class Xliff1xProcessor {
         // use static methods instead
     }
 
+    public static void resetFileIndex() {
+        fileIndex = 0;
+    }
+
     public static void processXliff1x(Element root, List<Element> units) {
         tag = 1;
-        fileIndex = 0;
         preserveSpaces = false;
         recurse1x(root, units);
     }

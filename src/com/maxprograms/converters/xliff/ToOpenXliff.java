@@ -68,6 +68,7 @@ public class ToOpenXliff {
                 result.add(Messages.getString("ToOpenXliff.0"));
                 return result;
             }
+            Xliff1xProcessor.resetFileIndex();
             for (Element originalFile : files) {
                 Element file = new Element("file");
                 file.setAttribute("datatype", "x-xliff");
