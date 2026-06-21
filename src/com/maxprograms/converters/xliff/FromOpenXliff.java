@@ -20,9 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -59,6 +57,7 @@ public class FromOpenXliff {
     private static String currentFile;
     private static Map<String, Element> fileMetadata;
     private static Map<String, Element> unitMetadata;
+    private static int skeletonFileIndex;
 
     private FromOpenXliff() {
         // do not instantiate this class
@@ -113,6 +112,7 @@ public class FromOpenXliff {
             throws SAXException, IOException, ParserConfigurationException {
         String version = rootElement.getAttributeValue("version");
         if (version.startsWith("1")) {
+            skeletonFileIndex = 0;
             recurse1x(rootElement);
         }
         if (version.startsWith("2")) {
@@ -126,10 +126,11 @@ public class FromOpenXliff {
 
     private static void recurse1x(Element root) throws SAXException, IOException, ParserConfigurationException {
         if ("file".equals(root.getName())) {
+            skeletonFileIndex++;
             tgtLang = root.getAttributeValue("target-language");
-            String original = root.getAttributeValue("original");
-            if (fileMetadata.containsKey(original)) {
-                root.addContent(fileMetadata.get(original));
+            String fileKey = String.valueOf(skeletonFileIndex);
+            if (fileMetadata.containsKey(fileKey)) {
+                root.addContent(fileMetadata.get(fileKey));
             }
         }
         if ("trans-unit".equals(root.getName()) && !root.getAttributeValue("translate").equals("no")) {
@@ -146,9 +147,7 @@ public class FromOpenXliff {
                     target.setContent(t.getContent());
                 }
                 List<XMLNode> content = segSource.getContent();
-                Iterator<XMLNode> it = content.iterator();
-                while (it.hasNext()) {
-                    XMLNode node = it.next();
+                for (XMLNode node : content) {
                     if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                         Element e = (Element) node;
                         if ("mrk".equals(e.getName()) && "seg".equals(e.getAttributeValue("mtype"))) {
@@ -193,9 +192,8 @@ public class FromOpenXliff {
         }
 
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse1x(it.next());
+        for (Element child : children) {
+            recurse1x(child);
         }
     }
 
@@ -205,9 +203,7 @@ public class FromOpenXliff {
         sb.append("<target>");
         List<XMLNode> content = target.getContent();
         auto = 1;
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode text = (TextNode) node;
                 sb.append(XMLUtils.cleanText(text.getText()));
@@ -243,16 +239,14 @@ public class FromOpenXliff {
         if ("protected".equals(mtype)) {
             mrk.setAttribute("translate", "no");
         }
-        if (Arrays.asList("generic", "comment", "term").contains(mtype)) {
+        if (List.of("generic", "comment", "term").contains(mtype)) {
             mrk.setAttribute("type", mtype);
         } else {
             mrk.setAttribute("type", "oxlf:" + mtype.replace(":", "_"));
         }
         List<XMLNode> newContent = new Vector<>();
         List<XMLNode> content = e.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 newContent.add(node);
             }
@@ -275,9 +269,7 @@ public class FromOpenXliff {
         boolean hasSegSource = root.getChild("seg-source") != null;
         List<XMLNode> newContent = new Vector<>();
         List<XMLNode> content = root.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             newContent.add(node);
             if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                 Element e = (Element) node;
@@ -333,9 +325,7 @@ public class FromOpenXliff {
             } else if (sklMetadata != null && xliffMetadata != null) {
                 sklMetadata.clone(xliffMetadata);
             }
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                Element seg = it.next();
+            for (Element seg : children) {
                 List<PI> list = seg.getPI(Constants.TOOLID);
                 if (!list.isEmpty()) {
                     String pi = list.get(0).getData();
@@ -363,9 +353,8 @@ public class FromOpenXliff {
             }
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurse2x(it.next());
+        for (Element child : children) {
+            recurse2x(child);
         }
     }
 
@@ -390,8 +379,11 @@ public class FromOpenXliff {
                     if (obj.has("id")) {
                         // original was XLIFF 2.x
                         currentFile = obj.getString("id");
+                    } else if (obj.has("fileId")) {
+                        // original was XLIFF 1.x, new scheme (6.0+)
+                        currentFile = obj.getString("fileId");
                     } else if (obj.has("original")) {
-                        // original was XLIFF 1.x
+                        // original was XLIFF 1.x, old scheme
                         currentFile = obj.getString("original");
                     }
                 }
@@ -402,8 +394,11 @@ public class FromOpenXliff {
                     if (obj.has("id")) {
                         // original was XLIFF 2.x
                         currentFile = obj.getString("id");
+                    } else if (obj.has("fileId")) {
+                        // original was XLIFF 1.x, new scheme (6.0+)
+                        currentFile = obj.getString("fileId");
                     } else if (obj.has("original")) {
-                        // original was XLIFF 1.x
+                        // original was XLIFF 1.x, old scheme
                         currentFile = obj.getString("original");
                     }
                 }
@@ -428,9 +423,8 @@ public class FromOpenXliff {
             return;
         }
         List<Element> children = e.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurseXliff(it.next());
+        for (Element child : children) {
+            recurseXliff(child);
         }
     }
 
@@ -484,10 +478,8 @@ public class FromOpenXliff {
 
     public static void restoreAttributes(Element e) {
         List<Attribute> atts = e.getAttributes();
-        Iterator<Attribute> at = atts.iterator();
         Vector<String> change = new Vector<>();
-        while (at.hasNext()) {
-            Attribute a = at.next();
+        for (Attribute a : atts) {
             if (a.getName().indexOf("__") != -1) {
                 change.add(a.getName());
             }
@@ -499,9 +491,8 @@ public class FromOpenXliff {
             e.removeAttribute(name);
         }
         List<Element> children = e.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            restoreAttributes(it.next());
+        for (Element child : children) {
+            restoreAttributes(child);
         }
     }
 }

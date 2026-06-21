@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -317,15 +316,13 @@ public class SvgStats {
 			List<Element> matches = e.getChildren("alt-trans");
 			if (!matches.isEmpty()) {
 				float max = 0;
-				Iterator<Element> it = matches.iterator();
-				while (it.hasNext()) {
-					Element match = it.next();
+				for (Element match : matches) {
 					try {
 						float quality = Float.parseFloat(match.getAttributeValue("match-quality", "0"));
 						if (quality > max) {
 							max = quality;
 						}
-					} catch (NumberFormatException ex) {
+					} catch (NumberFormatException _) {
 						// ignore
 					}
 				}
@@ -337,9 +334,8 @@ public class SvgStats {
 			segmentsList.add(status);
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			parseXliff(it.next());
+		for (Element child : children) {
+			parseXliff(child);
 		}
 	}
 
@@ -349,9 +345,7 @@ public class SvgStats {
 			Element matches = e.getChild("mtc:matches");
 			if (matches != null) {
 				List<Element> matchesList = matches.getChildren("mtc:match");
-				Iterator<Element> it = matchesList.iterator();
-				while (it.hasNext()) {
-					Element match = it.next();
+				for (Element match : matchesList) {
 					String ref = match.getAttributeValue("ref");
 					if (ref.startsWith("#")) {
 						ref = ref.substring(1);
@@ -384,9 +378,8 @@ public class SvgStats {
 			segmentsList.add(status);
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			parseXliff2(it.next());
+		for (Element child : children) {
+			parseXliff2(child);
 		}
 	}
 }

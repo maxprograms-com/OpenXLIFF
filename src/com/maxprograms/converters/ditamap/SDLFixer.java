@@ -18,12 +18,13 @@ import java.net.MalformedURLException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.maxprograms.xml.Catalog;
 import com.maxprograms.xml.Document;
@@ -31,8 +32,6 @@ import com.maxprograms.xml.Element;
 import com.maxprograms.xml.Indenter;
 import com.maxprograms.xml.SAXBuilder;
 import com.maxprograms.xml.XMLOutputter;
-
-import org.xml.sax.SAXException;
 
 public class SDLFixer {
 
@@ -70,10 +69,8 @@ public class SDLFixer {
 		outputter.preserveSpace(true);
 
 		Set<String> keys = table.keySet();
-		Iterator<String> it = keys.iterator();
-		while (it.hasNext()) {
+		for (String key : keys) {
 			changes = false;
-			String key = it.next();
 			File f = new File(folder, table.get(key));
 			Document doc = builder.build(f);
 			Element root = doc.getRootElement();

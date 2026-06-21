@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -195,9 +194,8 @@ public class MSOffice2Xliff {
 			writeOut("      </trans-unit>\n");
 			writeSkel("%%%" + segnum++ + "%%%");
 		} else {
-			Iterator<XMLNode> i = source.getContent().iterator();
-			while (i.hasNext()) {
-				XMLNode n = i.next();
+			List<XMLNode> sourceContent = source.getContent();
+			for (XMLNode n : sourceContent) {
 				if (n.getNodeType() == XMLNode.TEXT_NODE) {
 					writeSkel(XMLUtils.cleanText(replaceText(((TextNode) n).getText(), "\uE0FF", "&quot;")));
 				} else {
@@ -252,9 +250,7 @@ public class MSOffice2Xliff {
 	private static boolean containsText(Element source) {
 		List<XMLNode> content = source.getContent();
 		String string = "";
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				string = string + ((TextNode) n).getText();
 			}
@@ -283,9 +279,7 @@ public class MSOffice2Xliff {
 			throws IOException, SAXException, ParserConfigurationException {
 		writeSkel("<" + e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> at = atts.iterator();
-		while (at.hasNext()) {
-			Attribute a = at.next();
+		for (Attribute a : atts) {
 			if (isTableColumnNameAttribute(e, a)) {
 				writeSkel(" " + a.getName() + "=\"");
 				writeAttributeSegment(a.getValue());
@@ -297,9 +291,7 @@ public class MSOffice2Xliff {
 		writeSkel(">");
 
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				writeSkel(n.toString());
 			}
@@ -340,17 +332,13 @@ public class MSOffice2Xliff {
 		// send the opening tag to skeleton
 		writeSkel("<" + e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			writeSkel(" " + a.getName() + "=\"" + cleanAttribute(a.getValue()) + "\"");
 		}
 		writeSkel(">");
 
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				TextNode t = (TextNode) node;
 				text = text + t.toString();
@@ -381,17 +369,13 @@ public class MSOffice2Xliff {
 	private static void recurseVisioChild(Element e) {
 		text = text + "<ph>&lt;" + e.getName();
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			text = text + " " + a.getName() + "=\"" + cleanAttribute(a.getValue()) + "\"";
 		}
 		text = text + "&gt;</ph>";
 
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			if (node.getNodeType() == XMLNode.TEXT_NODE) {
 				TextNode t = (TextNode) node;
 				text = text + t.toString();
@@ -434,9 +418,7 @@ public class MSOffice2Xliff {
 		// send the opening tag to skeleton
 		writeSkel("<" + e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			writeSkel(" " + a.getName() + "=\"" + cleanAttribute(a.getValue()) + "\"");
 		}
 		writeSkel(">");
@@ -553,9 +535,8 @@ public class MSOffice2Xliff {
 		Map<String, Element> result = new HashMap<>();
 		Element regionProps = region.getChild("w:rPr");
 		if (regionProps != null) {
-			Iterator<Element> it = regionProps.getChildren().iterator();
-			while (it.hasNext()) {
-				Element prop = it.next();
+			List<Element> props = regionProps.getChildren();
+			for (Element prop : props) {
 				result.put(prop.getName(), prop);
 			}
 		}
@@ -564,14 +545,10 @@ public class MSOffice2Xliff {
 
 	private static void removeProperties(Element e, String name) {
 		List<Element> regions = e.getChildren("w:r");
-		Iterator<Element> r = regions.iterator();
-		while (r.hasNext()) {
-			Element region = r.next();
+		for (Element region : regions) {
 			List<Element> regionProps = region.getChildren("w:rPr");
-			Iterator<Element> it = regionProps.iterator();
 			List<Element> remove = new ArrayList<>();
-			while (it.hasNext()) {
-				Element props = it.next();
+			for (Element props : regionProps) {
 				Element prop = props.getChild(name);
 				if (prop != null) {
 					props.removeChild(prop);
@@ -644,9 +621,7 @@ public class MSOffice2Xliff {
 		}
 		text = text + "<ph>&lt;" + e.getName();
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			text = text + " " + a.getName() + "=\"" + cleanAttribute(a.getValue()) + "\"";
 		}
 		text = text + "&gt;</ph>";
@@ -678,9 +653,7 @@ public class MSOffice2Xliff {
 		sb.append("&lt;");
 		sb.append(e.getName());
 		List<Attribute> atts = e.getAttributes();
-		Iterator<Attribute> ia = atts.iterator();
-		while (ia.hasNext()) {
-			Attribute a = ia.next();
+		for (Attribute a : atts) {
 			sb.append(' ');
 			sb.append(a.getName());
 			sb.append("=\"");
@@ -699,9 +672,7 @@ public class MSOffice2Xliff {
 		} else {
 			sb.append("&gt;");
 		}
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element child = (Element) n;
 				sb.append(getImageText(child));
@@ -750,9 +721,7 @@ public class MSOffice2Xliff {
 		if (matcher.find()) {
 			List<XMLNode> newContent = new Vector<>();
 			List<XMLNode> content = src.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode node = it.next();
+			for (XMLNode node : content) {
 				if (node.getNodeType() == XMLNode.TEXT_NODE) {
 					TextNode t = (TextNode) node;
 					String nodeText = normalise(t.getText());
@@ -793,9 +762,7 @@ public class MSOffice2Xliff {
 		if (matcher.find()) {
 			List<XMLNode> newContent = new Vector<>();
 			List<XMLNode> content = src.getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode node = it.next();
+			for (XMLNode node : content) {
 				if (node.getNodeType() == XMLNode.TEXT_NODE) {
 					TextNode t = (TextNode) node;
 					String text = normalise(t.getText());
@@ -838,9 +805,8 @@ public class MSOffice2Xliff {
 		}
 		StringBuilder sb = new StringBuilder();
 		List<XMLNode> content = src.getContent();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			sb.append(it.next().toString());
+		for (XMLNode node : content) {
+			sb.append(node.toString());
 		}
 		return fakeTags ? sb.toString().replace("\uE100", "&lt;&lt;").replace("\uE101", "&gt;&gt;") : sb.toString();
 	}

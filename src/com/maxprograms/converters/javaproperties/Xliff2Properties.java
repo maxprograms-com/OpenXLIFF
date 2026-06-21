@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -145,9 +144,7 @@ public class Xliff2Properties {
 	private static String extractText(Element target) {
 		String result = "";
 		List<XMLNode> content = target.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element e = (Element) n;
 				result = result + extractText(e);
@@ -192,12 +189,10 @@ public class Xliff2Properties {
 		Element root = doc.getRootElement();
 		Element body = root.getChild("file").getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
 
 		segments = new HashMap<>();
 
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			segments.put(unit.getAttributeValue("id"), unit);
 		}
 	}

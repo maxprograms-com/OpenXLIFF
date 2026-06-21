@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.Iterator;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -419,11 +419,9 @@ public class EncodingResolver {
 		Map<String, Charset> charsets = new TreeMap<>(Charset.availableCharsets());
 		Set<String> keys = charsets.keySet();
 		String[] codes = new String[keys.size()];
-
-		Iterator<String> i = keys.iterator();
 		int j = 0;
-		while (i.hasNext()) {
-			Charset cset = charsets.get(i.next());
+		for (String key : keys) {
+			Charset cset = charsets.get(key);
 			codes[j++] = cset.displayName();
 		}
 		return codes;
@@ -434,9 +432,8 @@ public class EncodingResolver {
 		Set<String> keys = charsets.keySet();
 		JSONArray array = new JSONArray();
 
-		Iterator<String> i = keys.iterator();
-		while (i.hasNext()) {
-			Charset cset = charsets.get(i.next());
+		for (String key : keys) {
+			Charset cset = charsets.get(key);
 			JSONObject obj = new JSONObject();
 			obj.put("code", cset.displayName());
 			obj.put("description", cset.name());

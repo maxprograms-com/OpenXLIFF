@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -119,9 +118,8 @@ public class Xliff2Txlf {
             segments.put(e.getAttributeValue("id"), e);
         } else {
             List<Element> children = e.getChildren();
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                recurseXliff(it.next());
+            for (Element child : children) {
+                recurseXliff(child);
             }
         }
     }
@@ -164,18 +162,15 @@ public class Xliff2Txlf {
             return;
         }
         List<Element> children = root.getChildren();
-        Iterator<Element> it = children.iterator();
-        while (it.hasNext()) {
-            recurseSkeleton(it.next());
+        for (Element child : children) {
+            recurseSkeleton(child);
         }
     }
 
     private static void addtarget(Element root) {
         List<XMLNode> newContent = new Vector<>();
         List<XMLNode> content = root.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             newContent.add(node);
             if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
                 Element e = (Element) node;
@@ -192,9 +187,7 @@ public class Xliff2Txlf {
         StringBuilder sb = new StringBuilder();
         sb.append("<target>");
         List<XMLNode> content = target.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode text = (TextNode) node;
                 sb.append(XMLUtils.cleanText(text.getText()));
@@ -206,9 +199,7 @@ public class Xliff2Txlf {
                 } else {
                     StringBuilder tagContent = new StringBuilder();
                     List<XMLNode> tagNodes = e.getContent();
-                    Iterator<XMLNode> tagIt = tagNodes.iterator();
-                    while (tagIt.hasNext()) {
-                        XMLNode tagNode = tagIt.next();
+                    for (XMLNode tagNode : tagNodes) {
                         tagContent = tagContent.append(tagNode.toString());
                     }
                     sb.append(uncleanString(tagContent.toString()));

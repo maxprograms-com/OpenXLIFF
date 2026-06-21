@@ -22,10 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -65,6 +63,7 @@ import com.maxprograms.converters.xliff.ToOpenXliff;
 import com.maxprograms.converters.xml.Xml2Xliff;
 import com.maxprograms.xliff2.Resegmenter;
 import com.maxprograms.xliff2.ToXliff2;
+import com.maxprograms.xliff2.Xliff2Utils;
 import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
@@ -244,7 +243,7 @@ public class Convert {
 			}
 		}
 		String[] encodings = EncodingResolver.getPageCodes();
-		if (!Arrays.asList(encodings).contains(enc)) {
+		if (!List.of(encodings).contains(enc)) {
 			logger.log(Level.ERROR, Messages.getString("Convert.10"));
 			return;
 		}
@@ -368,7 +367,7 @@ public class Convert {
 					}
 				}
 				result = Resegmenter.run(xliff, srx, srcLang, CatalogBuilder.getCatalog(catalog), threads);
-			} catch (Exception e) {
+			} catch (Exception _) {
 				// do nothing
 			}
 		}
@@ -392,10 +391,8 @@ public class Convert {
 			Document doc = builder.build(fileName);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
 			Set<String> deleted = new HashSet<>();
-			while (it.hasNext()) {
-				Element file = it.next();
+			for (Element file : files) {
 				Element header = file.getChild("header");
 				Element skl = header.getChild("skl");
 				Element external = skl.getChild("external-file");
@@ -492,7 +489,21 @@ public class Convert {
 				params.put("generic", "yes");
 				result = Xml2Xliff.run(params);
 			} else if (format.equals(FileFormats.XLIFF)) {
-				result = ToOpenXliff.run(params);
+				boolean xliff2x = "yes".equals(params.get("xliff20")) || "yes".equals(params.get("xliff21"))
+						|| "yes".equals(params.get("xliff22"));
+				if (xliff2x && Xliff2Utils.isOpenXliffIntermediate(params.get("source"), params.get("catalog"))) {
+					String ver = "2.0";
+					if ("yes".equals(params.get("xliff21")))
+						ver = "2.1";
+					if ("yes".equals(params.get("xliff22")))
+						ver = "2.2";
+					result = ToXliff2.run(params.get("source"), params.get("xliff"), params.get("catalog"), ver, true);
+					params.remove("xliff20");
+					params.remove("xliff21");
+					params.remove("xliff22");
+				} else {
+					result = ToOpenXliff.run(params);
+				}
 			} else {
 				result.add(Constants.ERROR);
 				result.add(Messages.getString("Convert.20"));
@@ -511,7 +522,7 @@ public class Convert {
 				if (xliff22) {
 					version = "2.2";
 				}
-				result = ToXliff2.run(new File(params.get("xliff")), params.get("catalog"), version);
+				result = ToXliff2.run(params.get("xliff"), params.get("xliff"), params.get("catalog"), version, false);
 			}
 		} catch (Exception e) {
 			result.add(0, Constants.ERROR);
@@ -523,9 +534,8 @@ public class Convert {
 	private static void listCharsets() {
 		SortedMap<String, Charset> available = Charset.availableCharsets();
 		Set<String> keySet = available.keySet();
-		Iterator<String> it = keySet.iterator();
-		while (it.hasNext()) {
-			Charset charset = available.get(it.next());
+		for (String key : keySet) {
+			Charset charset = available.get(key);
 			System.out.println(charset.displayName());
 		}
 	}

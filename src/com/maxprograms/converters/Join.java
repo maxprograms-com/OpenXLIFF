@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +91,7 @@ public class Join {
 					target = json.getString("target");
 					list = new ArrayList<>();
 					JSONArray filesArray = json.getJSONArray("files");
-					for (int j=0 ; j<filesArray.length() ; j++) {
+					for (int j = 0; j < filesArray.length(); j++) {
 						list.add(filesArray.getString(j));
 					}
 				} catch (JSONException | IOException e) {
@@ -165,9 +164,7 @@ public class Join {
 					}
 				}
 				List<Attribute> atts = root.getAttributes();
-				Iterator<Attribute> at = atts.iterator();
-				while (at.hasNext()) {
-					Attribute a = at.next();
+				for (Attribute a : atts) {
 					if (!a.getNamespace().isEmpty() || "xmlns".equals(a.getName())) {
 						spaces.put(a.getName(), a);
 					}
@@ -190,17 +187,14 @@ public class Join {
 				}
 			}
 			Set<String> keys = spaces.keySet();
-			Iterator<String> kt = keys.iterator();
-			while (kt.hasNext()) {
-				Attribute a = spaces.get(kt.next());
+			for (String key : keys) {
+				Attribute a = spaces.get(key);
 				writeString(output, " " + a.toString());
 			}
 			writeString(output, ">\n");
 
-			Iterator<String> it = xliffs.iterator();
 			int count = 0;
-			while (it.hasNext()) {
-				String xliff = it.next();
+			for (String xliff : xliffs) {
 				File xliffFile = new File(xliff);
 				Document doc = builder.build(xliffFile);
 				Element root = doc.getRootElement();
@@ -242,9 +236,7 @@ public class Join {
 
 	private static MTree<String> filesTree(SortedSet<String> files) {
 		MTree<String> result = new MTree<>("");
-		Iterator<String> it = files.iterator();
-		while (it.hasNext()) {
-			String s = it.next();
+		for (String s : files) {
 			StringTokenizer st = new StringTokenizer(s, "/\\:", true);
 			MTree.Node<String> current = result.getRoot();
 			while (st.hasMoreTokens()) {

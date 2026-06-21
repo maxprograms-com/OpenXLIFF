@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -30,14 +29,14 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.xml.sax.SAXException;
+
 import com.maxprograms.converters.Constants;
 import com.maxprograms.converters.xml.Xliff2Xml;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
 import com.maxprograms.xml.SAXBuilder;
 import com.maxprograms.xml.XMLOutputter;
-
-import org.xml.sax.SAXException;
 
 public class Xliff2Idml {
 
@@ -59,9 +58,8 @@ public class Xliff2Idml {
 			Document doc = builder.build(xliffFile);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				saveFile(it.next(), xliffFile);
+			for (Element file : files) {
+				saveFile(file, xliffFile);
 			}
 			String skeleton = params.get("skeleton");
 			if (isEmbedded) {
@@ -170,9 +168,7 @@ public class Xliff2Idml {
 		root.addContent(file);
 		File xliff = File.createTempFile("tmp", ".xlf", new File(xliffFile).getParentFile());
 		List<Element> groups = file.getChild("header").getChildren("prop-group");
-		Iterator<Element> i = groups.iterator();
-		while (i.hasNext()) {
-			Element group = i.next();
+		for (Element group : groups) {
 			if (group.getAttributeValue("name").equals("document")) {
 				filesTable.put(group.getChild("prop").getText(), xliff.getAbsolutePath());
 			}

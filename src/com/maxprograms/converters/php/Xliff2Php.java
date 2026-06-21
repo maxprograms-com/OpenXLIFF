@@ -23,7 +23,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -135,9 +134,7 @@ public class Xliff2Php {
 	private static String extractText(Element target) {
 		String result = "";
 		List<XMLNode> content = target.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 				result = result + extractText((Element) n);
 			}
@@ -158,9 +155,7 @@ public class Xliff2Php {
 		Element root = doc.getRootElement();
 		Element body = root.getChild("file").getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			segments.put(unit.getAttributeValue("id"), unit);
 		}
 	}

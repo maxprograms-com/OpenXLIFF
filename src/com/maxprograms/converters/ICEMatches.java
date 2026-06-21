@@ -18,7 +18,6 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -126,7 +125,7 @@ public class ICEMatches {
             Files.delete(oldFile.toPath());
         }
         if (newFile.getName().startsWith("new__")) {
-            ToXliff2.run(newFile, catalogFile, version);
+            ToXliff2.run(newFile.getAbsolutePath(), newFile.getAbsolutePath(), catalogFile, version, false);
             Files.delete(new File(newXliff).toPath());
             Files.copy(newFile.toPath(), new File(newXliff).toPath());
             Files.delete(newFile.toPath());
@@ -260,9 +259,8 @@ public class ICEMatches {
             segments.add(root);
         } else {
             List<Element> list = root.getChildren();
-            Iterator<Element> it = list.iterator();
-            while (it.hasNext()) {
-                recurseSegments(it.next(), segments);
+            for (Element child : list) {
+                recurseSegments(child, segments);
             }
         }
     }

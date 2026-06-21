@@ -20,7 +20,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -157,18 +156,18 @@ public class XliffChecker {
 		xliffNamespaces.add("urn:oasis:names:tc:xliff:document:1.2");
 	}
 
-	private String getCatalog(String version) {
+	private String getCatalog(String version) throws IOException {
 		String home = System.getenv("OpenXLIFF_HOME");
 		if (home == null) {
 			home = System.getProperty("user.dir");
 		}
 		File catalogFolder = new File(new File(home), "catalog");
 		if (!catalogFolder.exists()) {
-			logger.log(Level.ERROR, Messages.getString("XliffChecker.2"));
+			throw new IOException(Messages.getString("XliffChecker.2"));
 		}
 		File validationFolder = new File(catalogFolder, "validation");
 		if (!validationFolder.exists()) {
-			logger.log(Level.ERROR, Messages.getString("XliffChecker.3"));
+			throw new IOException(Messages.getString("XliffChecker.3"));
 		}
 
 		File catalog = null;
@@ -182,6 +181,9 @@ public class XliffChecker {
 			case "2.2":
 				catalog = new File(validationFolder, "validation22.xml");
 				break;
+		}
+		if (catalog == null) {
+			throw new IOException(Messages.getString("XliffChecker.10"));
 		}
 		return catalog.getAbsolutePath();
 	}
@@ -975,9 +977,7 @@ public class XliffChecker {
 		if (e.getLocalName().equals("source") || e.getLocalName().equals("seg-source")
 				|| e.getLocalName().equals("target")) {
 			Set<String> keys = bxTable.keySet();
-			Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : keys) {
 				if (exTable.containsKey(key)) {
 					exTable.remove(key);
 					bxTable.remove(key);
@@ -990,9 +990,7 @@ public class XliffChecker {
 				return false;
 			}
 			keys = bptTable.keySet();
-			it = keys.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : keys) {
 				if (eptTable.containsKey(key)) {
 					eptTable.remove(key);
 					bptTable.remove(key);
@@ -1015,9 +1013,8 @@ public class XliffChecker {
 		// check for missing <trans-unit> referenced in <sub>
 		if (e.getLocalName().equals("file")) {
 			Set<String> keys = xids.keySet();
-			Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				if (!ids.containsKey(it.next())) {
+			for (String key : keys) {
+				if (!ids.containsKey(key)) {
 					reason = Messages.getString("XliffChecker.40");
 					return false;
 				}

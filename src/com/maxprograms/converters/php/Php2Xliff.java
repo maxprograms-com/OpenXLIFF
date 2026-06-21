@@ -20,7 +20,6 @@ import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +37,8 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Php2Xliff {
 
-	private static final Pattern START_TAG_PATTERN = Pattern.compile("<[A-Za-z0-9]+([\\s][A-Za-z\\-\\.]+=[\"|\'][^<&>]*[\"|\'])[\\s]*/?>");
+	private static final Pattern START_TAG_PATTERN = Pattern
+			.compile("<[A-Za-z0-9]+([\\s][A-Za-z\\-\\.]+=[\"|\'][^<&>]*[\"|\'])[\\s]*/?>");
 	private static final Pattern END_TAG_PATTERN = Pattern.compile("</[A-Za-z0-9]+>");
 
 	private static final class Context {
@@ -87,7 +87,7 @@ public class Php2Xliff {
 				}
 
 				writeString(output, "<file original=\"" + inputFile
-					+ "\" source-language=\"" + ctx.sourceLanguage
+						+ "\" source-language=\"" + ctx.sourceLanguage
 						+ target
 						+ "\" datatype=\"x-phparray\">\n");
 				writeString(output, "<header>\n");
@@ -308,9 +308,7 @@ public class Php2Xliff {
 		result = XMLUtils.cleanText(result);
 
 		Set<String> keys = table.keySet();
-		Iterator<String> it = keys.iterator();
-		while (it.hasNext()) {
-			String key = it.next();
+		for (String key : keys) {
 			Element tag = table.get(key);
 			result = replaceTag(result, key, tag);
 		}

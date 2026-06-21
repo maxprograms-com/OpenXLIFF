@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -121,9 +120,8 @@ public class Xliff2Wpml {
             target.addContent(new CData(text));
         } else {
             List<Element> children = e.getChildren();
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                recurseSkeleton(it.next());
+            for (Element child : children) {
+                recurseSkeleton(child);
             }
         }
     }
@@ -147,9 +145,8 @@ public class Xliff2Wpml {
             segments.put(e.getAttributeValue("id"), e);
         } else {
             List<Element> children = e.getChildren();
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                recurseXliff(it.next());
+            for (Element child : children) {
+                recurseXliff(child);
             }
         }
     }

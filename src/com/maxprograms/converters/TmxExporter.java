@@ -24,7 +24,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
@@ -191,9 +190,7 @@ public class TmxExporter {
 				writeString(output, "<body>\n");
 
 				List<Element> files = root.getChildren("file");
-				Iterator<Element> fileiterator = files.iterator();
-				while (fileiterator.hasNext()) {
-					Element file = fileiterator.next();
+				for (Element file : files) {
 					sourceLang = file.getAttributeValue("source-language");
 					targetLang = file.getAttributeValue("target-language");
 					original = "" + file.getAttributeValue("original").hashCode();
@@ -214,9 +211,7 @@ public class TmxExporter {
 
 	private static void recurse(FileOutputStream output, Element e) throws IOException {
 		List<Element> list = e.getChildren();
-		Iterator<Element> i = list.iterator();
-		while (i.hasNext()) {
-			Element element = i.next();
+		for (Element element : list) {
 			if (element.getName().equals("trans-unit")) {
 				writeSegment(output, element);
 			} else {
@@ -266,9 +261,7 @@ public class TmxExporter {
 			}
 
 			List<Element> notes = segment.getChildren("note");
-			Iterator<Element> it = notes.iterator();
-			while (it.hasNext()) {
-				Element note = it.next();
+			for (Element note : notes) {
 				String lang = note.getAttributeValue("xml:lang");
 				if (!lang.isEmpty()) {
 					lang = " xml:lang=\"" + lang + "\"";
@@ -296,10 +289,8 @@ public class TmxExporter {
 		if (type.equals("source") || type.equals("target")) {
 			match = 0;
 			List<XMLNode> l = src.getContent();
-			Iterator<XMLNode> i = l.iterator();
 			StringBuilder text = new StringBuilder();
-			while (i.hasNext()) {
-				XMLNode o = i.next();
+			for (XMLNode o : l) {
 				switch (o.getNodeType()) {
 					case XMLNode.TEXT_NODE:
 						text.append(o.toString());
@@ -317,7 +308,6 @@ public class TmxExporter {
 
 		if (type.equals("bx") || type.equals("ex") || type.equals("ph")) {
 			List<XMLNode> l = src.getContent();
-			Iterator<XMLNode> i = l.iterator();
 			String ctype = src.getAttributeValue("ctype");
 			if (!ctype.isEmpty()) {
 				ctype = " type=\"" + XMLUtils.cleanText(ctype) + "\"";
@@ -339,8 +329,7 @@ public class TmxExporter {
 			text.append(assoc);
 			text.append(x);
 			text.append('>');
-			while (i.hasNext()) {
-				XMLNode o = i.next();
+			for (XMLNode o : l) {
 				switch (o.getNodeType()) {
 					case XMLNode.TEXT_NODE:
 						text.append(o.toString());
@@ -366,9 +355,7 @@ public class TmxExporter {
 			open.append('<');
 			open.append(src.getName());
 			List<Attribute> atts = src.getAttributes();
-			Iterator<Attribute> h = atts.iterator();
-			while (h.hasNext()) {
-				Attribute a = h.next();
+			for (Attribute a : atts) {
 				open.append(' ');
 				open.append(a.getName());
 				open.append("=\"");
@@ -388,9 +375,7 @@ public class TmxExporter {
 				text.append("\">");
 				text.append(XMLUtils.cleanText(open.toString()));
 				text.append("</bpt>");
-				Iterator<XMLNode> k = l.iterator();
-				while (k.hasNext()) {
-					XMLNode n = k.next();
+				for (XMLNode n : l) {
 					if (n.getNodeType() == XMLNode.TEXT_NODE) {
 						text.append(n.toString());
 					}
@@ -406,7 +391,6 @@ public class TmxExporter {
 
 		if (type.equals("it")) {
 			List<XMLNode> l = src.getContent();
-			Iterator<XMLNode> i = l.iterator();
 			String ctype = src.getAttributeValue("ctype");
 			if (!ctype.isEmpty()) {
 				ctype = " type=\"" + XMLUtils.cleanText(ctype) + "\"";
@@ -422,8 +406,7 @@ public class TmxExporter {
 			text.append(ctype);
 			text.append(pos);
 			text.append('>');
-			while (i.hasNext()) {
-				XMLNode o = i.next();
+			for (XMLNode o : l) {
 				switch (o.getNodeType()) {
 					case XMLNode.TEXT_NODE:
 						text.append(o.toString());
@@ -441,7 +424,6 @@ public class TmxExporter {
 
 		if (type.equals("bpt") || type.equals("ept")) {
 			List<XMLNode> l = src.getContent();
-			Iterator<XMLNode> i = l.iterator();
 			String ctype = src.getAttributeValue("ctype");
 			if (!ctype.isEmpty()) {
 				ctype = " type=\"" + XMLUtils.cleanText(ctype) + "\"";
@@ -458,8 +440,7 @@ public class TmxExporter {
 			text.append(ctype);
 			text.append(rid);
 			text.append('>');
-			while (i.hasNext()) {
-				XMLNode o = i.next();
+			for (XMLNode o : l) {
 				switch (o.getNodeType()) {
 					case XMLNode.TEXT_NODE:
 						text.append(o.toString());
@@ -479,11 +460,9 @@ public class TmxExporter {
 
 		if (type.equals("sub")) {
 			List<XMLNode> l = src.getContent();
-			Iterator<XMLNode> i = l.iterator();
 			StringBuilder text = new StringBuilder();
 			text.append("<sub>");
-			while (i.hasNext()) {
-				XMLNode o = i.next();
+			for (XMLNode o : l) {
 				switch (o.getNodeType()) {
 					case XMLNode.TEXT_NODE:
 						text.append(o.toString());

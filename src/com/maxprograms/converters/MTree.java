@@ -39,9 +39,7 @@ public class MTree<T extends Serializable> implements Serializable {
 		}
 
 		public Node<T> getChild(T value) {
-			Iterator<Node<T>> it = children.iterator();
-			while (it.hasNext()) {
-				Node<T> child = it.next();
+			for (Node<T> child : children) {
 				if (value.equals(child.data)) {
 					return child;
 				}
@@ -69,7 +67,7 @@ public class MTree<T extends Serializable> implements Serializable {
 			return children.get(i);
 		}
 	}
-	
+
 	private static final long serialVersionUID = 5458283808659252781L;
 	private Node<T> root;
 
@@ -84,8 +82,6 @@ public class MTree<T extends Serializable> implements Serializable {
 	public Node<T> getRoot() {
 		return root;
 	}
-
-	
 
 	public MTree<T> prune() {
 		Node<T> newRoot = root;

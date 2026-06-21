@@ -20,7 +20,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -87,9 +86,8 @@ public class Xliff2DitaMap {
 			Document doc = builder.build(xliffFile);
 			Element root = doc.getRootElement();
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				saveFile(it.next(), xliffFile);
+			for (Element file : files) {
+				saveFile(file, xliffFile);
 			}
 			String tgtlang = files.get(0).getAttributeValue("target-language",
 					files.get(0).getAttributeValue("source-language"));
@@ -126,7 +124,7 @@ public class Xliff2DitaMap {
 				if (maxThreads < 1) {
 					maxThreads = 1;
 				}
-			} catch (NumberFormatException e) {
+			} catch (NumberFormatException _) {
 				// Use default if invalid
 				maxThreads = Runtime.getRuntime().availableProcessors();
 			}
@@ -148,6 +146,9 @@ public class Xliff2DitaMap {
 			for (Future<ProcessingResult> future : futures) {
 				try {
 					results.add(future.get());
+				} catch (InterruptedException _) {
+					Thread.currentThread().interrupt();
+					break;
 				} catch (Exception e) {
 					logger.log(Level.ERROR, "Error processing file", e);
 					results.add(new ProcessingResult(e.getMessage()));
@@ -287,9 +288,7 @@ public class Xliff2DitaMap {
 		} else {
 			List<XMLNode> content = e.getContent();
 			List<XMLNode> newContent = new ArrayList<>();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
 					Element child = (Element) n;
 					emptyElement(child);

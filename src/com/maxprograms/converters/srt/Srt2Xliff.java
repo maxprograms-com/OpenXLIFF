@@ -20,7 +20,6 @@ import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -169,9 +168,7 @@ public class Srt2Xliff {
         if (matcher.find()) {
             List<XMLNode> newContent = new ArrayList<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = t.getText();
@@ -208,9 +205,7 @@ public class Srt2Xliff {
         if (matcher.find()) {
             List<XMLNode> newContent = new ArrayList<>();
             List<XMLNode> content = src.getContent();
-            Iterator<XMLNode> it = content.iterator();
-            while (it.hasNext()) {
-                XMLNode node = it.next();
+            for (XMLNode node : content) {
                 if (node.getNodeType() == XMLNode.TEXT_NODE) {
                     TextNode t = (TextNode) node;
                     String text = t.getText();

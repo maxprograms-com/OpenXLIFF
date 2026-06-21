@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -139,9 +138,7 @@ public class Xliff2Mif {
 		charmap = new HashMap<>();
 		Element croot = cdoc.getRootElement();
 		List<Element> codes = croot.getChildren("char");
-		Iterator<Element> it = codes.iterator();
-		while (it.hasNext()) {
-			Element e = it.next();
+		for (Element e : codes) {
 			charmap.put(e.getText(), e.getAttributeValue("code"));
 		}
 	}
@@ -149,9 +146,7 @@ public class Xliff2Mif {
 	private static void process(Element e) throws IOException {
 		String result = "";
 		List<XMLNode> content = e.getContent();
-		Iterator<XMLNode> i = content.iterator();
-		while (i.hasNext()) {
-			XMLNode n = i.next();
+		for (XMLNode n : content) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				result += "   <String `" + cleanString(((TextNode) n).getText()) + "'>\n";
 			}
@@ -174,12 +169,10 @@ public class Xliff2Mif {
 		Element root = doc.getRootElement();
 		Element body = root.getChild("file").getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
 
 		segments = new HashMap<>();
 
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			segments.put(unit.getAttributeValue("id"), unit);
 		}
 	}

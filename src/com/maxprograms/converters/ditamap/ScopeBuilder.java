@@ -21,7 +21,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -162,7 +161,7 @@ public class ScopeBuilder {
 								logger.log(Level.WARNING, issue);
 								issues.add(issue);
 							}
-						} catch (IOException ioe) {
+						} catch (IOException _) {
 							// ignore files that can't be parsed
 						}
 					}
@@ -170,9 +169,8 @@ public class ScopeBuilder {
 			}
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			recurse(it.next(), parentFile);
+		for (Element child : children) {
+			recurse(child, parentFile);
 		}
 		if (!scope.isEmpty()) {
 			currentScope = oldScope;
@@ -188,11 +186,9 @@ public class ScopeBuilder {
 		Element root = doc.getRootElement();
 		if (root.getName().equals("val")) {
 			List<Element> props = root.getChildren("prop");
-			Iterator<Element> it = props.iterator();
 			excludeTable = new HashMap<>();
 			includeTable = new HashMap<>();
-			while (it.hasNext()) {
-				Element prop = it.next();
+			for (Element prop : props) {
 				if (prop.getAttributeValue("action", "include").equals("exclude")) {
 					String att = prop.getAttributeValue("att");
 					String val = prop.getAttributeValue("val");
@@ -227,9 +223,7 @@ public class ScopeBuilder {
 	private static boolean filterOut(Element e) {
 		if (filterAttributes) {
 			List<Attribute> atts = e.getAttributes();
-			Iterator<Attribute> it = atts.iterator();
-			while (it.hasNext()) {
-				Attribute a = it.next();
+			for (Attribute a : atts) {
 				if (excludeTable.containsKey(a.getName())) {
 					Set<String> forbidden = excludeTable.get(a.getName());
 					if (forbidden.isEmpty() && includeTable.containsKey(a.getName())) {

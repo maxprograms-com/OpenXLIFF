@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -109,9 +108,7 @@ public class Xliff2Txml {
 			Element seg = segments.get(id);
 			e.setText("");
 			List<XMLNode> content = seg.getChild("target").getContent();
-			Iterator<XMLNode> it = content.iterator();
-			while (it.hasNext()) {
-				XMLNode n = it.next();
+			for (XMLNode n : content) {
 				if (n.getNodeType() == XMLNode.TEXT_NODE) {
 					e.addContent(((TextNode) n).getText().replaceAll("[\\n\\r]", ""));
 				}
@@ -122,9 +119,8 @@ public class Xliff2Txml {
 			}
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				replaceTargets(it.next());
+			for (Element child : children) {
+				replaceTargets(child);
 			}
 		}
 	}
@@ -148,12 +144,10 @@ public class Xliff2Txml {
 		Element root = sdoc.getRootElement();
 		Element body = root.getChild("file").getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
 
 		segments = new HashMap<>();
 
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			segments.put(unit.getAttributeValue("id"), unit);
 		}
 	}

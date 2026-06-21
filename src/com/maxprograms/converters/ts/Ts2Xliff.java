@@ -17,7 +17,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -120,9 +119,8 @@ public class Ts2Xliff {
 			writeString("</trans-unit>\n");
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				recurse(it.next());
+			for (Element child : children) {
+				recurse(child);
 			}
 		}
 	}
@@ -139,9 +137,7 @@ public class Ts2Xliff {
 		String result = "";
 		int id = 0;
 		List<XMLNode> nodes = e.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				result = result + n.toString();
 			}

@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,9 +72,7 @@ public class Xliff2Sdl {
 			loadSkeleton();
 
 			Set<String> keys = segments.keySet();
-			Iterator<String> it = keys.iterator();
-			while (it.hasNext()) {
-				String key = it.next();
+			for (String key : keys) {
 				Element unit = segments.get(key);
 				if (type.equals("sdlxliff")) {
 					if (!unit.getAttributeValue("translate", "yes").equals("no")) {
@@ -172,9 +169,7 @@ public class Xliff2Sdl {
 			Element defs = unit.getChild("sdl:seg-defs");
 			if (defs != null) {
 				List<Element> children = defs.getChildren("sdl:seg");
-				Iterator<Element> it = children.iterator();
-				while (it.hasNext()) {
-					Element seg = it.next();
+				for (Element seg : children) {
 					if (seg.getAttributeValue("id").equals(mrkId)) {
 						seg.setAttribute("conf", "Translated");
 					}
@@ -186,9 +181,7 @@ public class Xliff2Sdl {
 	private static void addTarget(Element unit, Element target) {
 		List<XMLNode> content = unit.getContent();
 		List<XMLNode> newContent = new ArrayList<>();
-		Iterator<XMLNode> it = content.iterator();
-		while (it.hasNext()) {
-			XMLNode node = it.next();
+		for (XMLNode node : content) {
 			newContent.add(node);
 			if (node.getNodeType() == XMLNode.ELEMENT_NODE) {
 				Element n = (Element) node;
@@ -205,9 +198,8 @@ public class Xliff2Sdl {
 			return e;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element res = locateMrk(it.next(), mrkId);
+		for (Element child : children) {
+			Element res = locateMrk(child, mrkId);
 			if (res != null) {
 				return res;
 			}
@@ -220,9 +212,8 @@ public class Xliff2Sdl {
 			return e;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> it = children.iterator();
-		while (it.hasNext()) {
-			Element res = locateUnit(it.next(), id);
+		for (Element child : children) {
+			Element res = locateUnit(child, id);
 			if (res != null) {
 				return res;
 			}
@@ -245,12 +236,10 @@ public class Xliff2Sdl {
 		Element xroot = xdoc.getRootElement();
 		Element body = xroot.getChild("file").getChild("body");
 		List<Element> units = body.getChildren("trans-unit");
-		Iterator<Element> i = units.iterator();
 
 		segments = new HashMap<>();
 
-		while (i.hasNext()) {
-			Element unit = i.next();
+		for (Element unit : units) {
 			segments.put(unit.getAttributeValue("id"), unit);
 		}
 	}

@@ -22,11 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import com.maxprograms.converters.Constants;
 import com.maxprograms.xml.Document;
@@ -34,8 +35,6 @@ import com.maxprograms.xml.Element;
 import com.maxprograms.xml.SAXBuilder;
 import com.maxprograms.xml.XMLNode;
 import com.maxprograms.xml.XMLOutputter;
-
-import org.xml.sax.SAXException;
 
 public class Xliff2Ts {
 
@@ -112,9 +111,8 @@ public class Xliff2Ts {
 			}
 		} else {
 			List<Element> children = e.getChildren();
-			Iterator<Element> it = children.iterator();
-			while (it.hasNext()) {
-				recurseSkl(it.next());
+			for (Element child : children) {
+				recurseSkl(child);
 			}
 		}
 	}
@@ -122,9 +120,7 @@ public class Xliff2Ts {
 	private static Element getTranslation(Element e) throws SAXException, IOException, ParserConfigurationException {
 		String result = "";
 		List<XMLNode> nodes = e.getContent();
-		Iterator<XMLNode> it = nodes.iterator();
-		while (it.hasNext()) {
-			XMLNode n = it.next();
+		for (XMLNode n : nodes) {
 			if (n.getNodeType() == XMLNode.TEXT_NODE) {
 				result = result + n.toString();
 			}
@@ -149,9 +145,7 @@ public class Xliff2Ts {
 
 	private static void recurseXliff(Element e) {
 		List<Element> list = e.getChildren();
-		Iterator<Element> i = list.iterator();
-		while (i.hasNext()) {
-			Element u = i.next();
+		for (Element u : list) {
 			if (u.getName().equals("trans-unit")) {
 				segments.put(u.getAttributeValue("id"), u);
 			} else {

@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -312,9 +311,7 @@ public class Sdlppx2Xliff {
 		}
 		Element directions = projectRoot.getChild("LanguageDirections");
 		List<Element> directionsList = directions.getChildren("LanguageDirection");
-		Iterator<Element> it = directionsList.iterator();
-		while (it.hasNext()) {
-			Element direction = it.next();
+		for (Element direction : directionsList) {
 			String sourceLanguageCode = LanguageUtils.normalizeCode(direction.getAttributeValue("SourceLanguageCode"));
 			if (!srcLangs.contains(sourceLanguageCode)) {
 				srcLangs.add(sourceLanguageCode);

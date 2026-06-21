@@ -24,7 +24,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +57,7 @@ import com.maxprograms.converters.wpml.Xliff2Wpml;
 import com.maxprograms.converters.xliff.FromOpenXliff;
 import com.maxprograms.converters.xml.Xliff2Xml;
 import com.maxprograms.xliff2.FromXliff2;
+import com.maxprograms.xliff2.Xliff2Utils;
 import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
@@ -203,6 +203,11 @@ public class Merge {
 			loadXliff(xliff, catalog);
 			boolean unapproved = acceptUnaproved;
 			if (root.getAttributeValue("version").startsWith("2.")) {
+				if (Xliff2Utils.isXliffUpgrade(root)) {
+					FromXliff2.run(xliff, target, catalog);
+					result.add(Constants.SUCCESS);
+					return result;
+				}
 				File tmpXliff = File.createTempFile("temp", ".xlf", new File(xliff).getParentFile());
 				FromXliff2.run(xliff, tmpXliff.getAbsolutePath(), catalog);
 				loadXliff(tmpXliff.getAbsolutePath(), catalog);
@@ -217,9 +222,7 @@ public class Merge {
 
 			List<Element> files = root.getChildren("file");
 			fileSet = new HashSet<>();
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				Element file = it.next();
+			for (Element file : files) {
 				fileSet.add(file.getAttributeValue("original"));
 			}
 
@@ -238,19 +241,15 @@ public class Merge {
 					Files.createDirectories(f.toPath());
 				}
 			}
-			Iterator<String> ft = fileSet.iterator();
 			List<Map<String, String>> paramsList = new ArrayList<>();
-			while (ft.hasNext()) {
-				String file = ft.next();
+			for (String file : fileSet) {
 				File xliffFile = File.createTempFile("temp", ".xlf");
 				String[] pair = saveXliff(file, xliffFile);
 				String encoding = pair[0];
 				if (encoding.isEmpty()) {
 					List<PI> pis = root.getPI();
 					if (pis != null) {
-						Iterator<PI> pt = pis.iterator();
-						while (pt.hasNext()) {
-							PI pi = pt.next();
+						for (PI pi : pis) {
 							if (pi.getTarget().equals("encoding")) {
 								encoding = pi.getData();
 							}
@@ -339,16 +338,12 @@ public class Merge {
 		try (FileOutputStream out = new FileOutputStream(xliff)) {
 			writeStr(out, "<xliff version=\"1.2\">\n");
 			List<Element> files = root.getChildren("file");
-			Iterator<Element> it = files.iterator();
-			while (it.hasNext()) {
-				Element file = it.next();
+			for (Element file : files) {
 				if (file.getAttributeValue("original").equals(fileName)) {
 					dataType = file.getAttributeValue("datatype");
 					List<PI> pis = file.getPI();
 					if (pis != null) {
-						Iterator<PI> pt = pis.iterator();
-						while (pt.hasNext()) {
-							PI pi = pt.next();
+						for (PI pi : pis) {
 							if (pi.getTarget().equals("encoding")) {
 								encoding = pi.getData();
 							}
@@ -502,9 +497,7 @@ public class Merge {
 			return true;
 		}
 		List<Element> children = e.getChildren();
-		Iterator<Element> i = children.iterator();
-		while (i.hasNext()) {
-			Element child = i.next();
+		for (Element child : children) {
 			if (checkGroups(child)) {
 				return true;
 			}
@@ -593,17 +586,13 @@ public class Merge {
 		}
 		String target = "";
 		TreeSet<String> originals = new TreeSet<>();
-		Iterator<Element> it = files.iterator();
-		while (it.hasNext()) {
-			originals.add(it.next().getAttributeValue("original"));
+		for (Element original : files) {
+			originals.add(original.getAttributeValue("original"));
 		}
 		if (originals.size() == 1) {
 			if (file.endsWith(".xlf")) {
 				target = file.substring(0, file.length() - ".xlf".length());
-				if (target.indexOf('.') != -1) {
-					target = target.substring(0, target.lastIndexOf('.'))
-							+ "_" + tgtLanguage + target.substring(target.lastIndexOf('.'));
-				} else {
+				if (target.endsWith("_" + tgtLanguage) || target.indexOf('.') == -1) {
 					String original = originals.first();
 					if (original.indexOf('.') != -1) {
 						target = original.substring(0, original.lastIndexOf('.'))
@@ -611,6 +600,9 @@ public class Merge {
 					} else {
 						target = original + "_" + tgtLanguage;
 					}
+				} else {
+					target = target.substring(0, target.lastIndexOf('.'))
+							+ "_" + tgtLanguage + target.substring(target.lastIndexOf('.'));
 				}
 			} else {
 				if (target.indexOf('.') != -1) {

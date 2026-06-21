@@ -18,7 +18,6 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -61,10 +60,10 @@ public class Resegmenter {
             builder.setEntityResolver(catalog);
             Document doc = builder.build(xliff);
             Element root = doc.getRootElement();
-            
+
             // Get all <file> elements for parallel processing
             List<Element> fileElements = root.getChildren("file");
-            
+
             if (fileElements.isEmpty()) {
                 // No file elements, just recurse normally
                 Context ctx = new Context();
@@ -72,27 +71,28 @@ public class Resegmenter {
                 recurse(ctx, root);
             } else {
                 // Process file elements in parallel
-                ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
-                List<Future<Void>> futures = new ArrayList<>();
-                
-                for (Element fileElement : fileElements) {
-                    Callable<Void> task = () -> {
-                        Context ctx = new Context();
-                        ctx.segmenter = SegmenterPool.getSegmenter(srx, srcLang, catalog);
-                        recurse(ctx, fileElement);
-                        return null;
-                    };
-                    futures.add(executor.submit(task));
+                try (ExecutorService executor = Executors.newFixedThreadPool(maxThreads)) {
+                    List<Future<Void>> futures = new ArrayList<>();
+
+                    for (Element fileElement : fileElements) {
+                        Callable<Void> task = () -> {
+                            Context ctx = new Context();
+                            ctx.segmenter = SegmenterPool.getSegmenter(srx, srcLang, catalog);
+                            recurse(ctx, fileElement);
+                            return null;
+                        };
+                        futures.add(executor.submit(task));
+                    }
+
+                    // Wait for all tasks to complete
+                    for (Future<Void> future : futures) {
+                        future.get();
+                    }
+
+                    executor.shutdown();
                 }
-                
-                // Wait for all tasks to complete
-                for (Future<Void> future : futures) {
-                    future.get();
-                }
-                
-                executor.shutdown();
             }
-            
+
             try (FileOutputStream out = new FileOutputStream(new File(xliff))) {
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.preserveSpace(true);
@@ -100,6 +100,10 @@ public class Resegmenter {
                 outputter.output(doc, out);
             }
             result.add(Constants.SUCCESS);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            result.add(Constants.ERROR);
+            result.add(ie.getMessage());
         } catch (Exception e) {
             Logger logger = System.getLogger(Resegmenter.class.getName());
             logger.log(Level.ERROR, Messages.getString("Resegmenter.1"), e);
@@ -150,9 +154,7 @@ public class Resegmenter {
                     int id = 0;
                     root.removeChild(segment);
                     List<XMLNode> content = segSource.getContent();
-                    Iterator<XMLNode> it = content.iterator();
-                    while (it.hasNext()) {
-                        XMLNode n = it.next();
+                    for (XMLNode n : content) {
                         if (n.getNodeType() == XMLNode.ELEMENT_NODE) {
                             Element e = (Element) n;
                             if ("mrk".equals(e.getName()) && "seg".equals(e.getAttributeValue("mtype"))) {
@@ -217,18 +219,15 @@ public class Resegmenter {
             }
         } else {
             List<Element> children = root.getChildren();
-            Iterator<Element> it = children.iterator();
-            while (it.hasNext()) {
-                recurse(ctx, it.next());
+            for (Element child : children) {
+                recurse(ctx, child);
             }
         }
     }
 
     private static boolean hasText(Element e) {
         List<XMLNode> content = e.getContent();
-        Iterator<XMLNode> it = content.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : content) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode t = (TextNode) node;
                 if (!t.getText().isBlank()) {

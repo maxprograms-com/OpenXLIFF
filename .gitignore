@@ -5,6 +5,7 @@
 .vscode/
 .gradle/
 .github/
+.claude/
 bin/
 build/
 dist/

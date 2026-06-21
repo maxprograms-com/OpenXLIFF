@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,9 +66,7 @@ public class XliffUtils {
         builder.append('<');
         builder.append(e.getName());
         List<Attribute> atts = e.getAttributes();
-        Iterator<Attribute> it = atts.iterator();
-        while (it.hasNext()) {
-            Attribute a = it.next();
+        for (Attribute a : atts) {
             builder.append(' ');
             builder.append(a.toString());
         }
@@ -79,9 +76,7 @@ public class XliffUtils {
 
     public static boolean hasText(Element e) {
         List<XMLNode> nodes = e.getContent();
-        Iterator<XMLNode> it = nodes.iterator();
-        while (it.hasNext()) {
-            XMLNode node = it.next();
+        for (XMLNode node : nodes) {
             if (node.getNodeType() == XMLNode.TEXT_NODE) {
                 TextNode t = (TextNode) node;
                 String text = t.getText();

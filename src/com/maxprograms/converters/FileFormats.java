@@ -21,7 +21,7 @@ import java.lang.System.Logger.Level;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -77,7 +77,7 @@ public class FileFormats {
 			PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, WPML, XLIFF, XML, XMLG };
 
 	public static boolean isBilingual(String type) {
-		return Arrays.asList(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF).contains(type);
+		return List.of(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF).contains(type);
 	}
 
 	public static void main(String[] args) {
@@ -309,7 +309,7 @@ public class FileFormats {
 				loadJSON(file, bom);
 				return JSON;
 			}
-		} catch (Exception e) {
+		} catch (Exception _) {
 			// do nothing
 		}
 		if (fileName.endsWith(".properties")) {

@@ -208,9 +208,7 @@ public class Json2Xliff {
         String latin = catalog.matchPublic("-//W3C//ENTITIES Latin 1 for XHTML//EN");
         Grammar grammar = parser.parse(new File(latin));
         List<EntityDecl> declarations = grammar.getEntities();
-        Iterator<EntityDecl> it = declarations.iterator();
-        while (it.hasNext()) {
-            EntityDecl e = it.next();
+        for (EntityDecl e : declarations) {
             String value = e.getValue();
             Matcher matcher = pattern.matcher(value);
             if (matcher.matches()) {
@@ -222,9 +220,7 @@ public class Json2Xliff {
         String special = catalog.matchPublic("-//W3C//ENTITIES Special for XHTML//EN");
         grammar = parser.parse(new File(special));
         declarations = grammar.getEntities();
-        it = declarations.iterator();
-        while (it.hasNext()) {
-            EntityDecl e = it.next();
+        for (EntityDecl e : declarations) {
             String value = e.getValue();
             Matcher matcher = pattern.matcher(value);
             if (matcher.matches()) {
@@ -236,9 +232,7 @@ public class Json2Xliff {
         String symbols = catalog.matchPublic("-//W3C//ENTITIES Symbols for XHTML//EN");
         grammar = parser.parse(new File(symbols));
         declarations = grammar.getEntities();
-        it = declarations.iterator();
-        while (it.hasNext()) {
-            EntityDecl e = it.next();
+        for (EntityDecl e : declarations) {
             String value = e.getValue();
             Matcher matcher = pattern.matcher(value);
             if (matcher.matches()) {
