@@ -26,6 +26,7 @@ Support for multiple input formats is built in through internal filters, allowin
 - **[Approve All Segments](https://github.com/maxprograms-com/OpenXLIFF#approve-all-segments)**
 - **[Remove All Targets](https://github.com/maxprograms-com/OpenXLIFF#remove-all-targets)**
 - **[Export Approved Segments as TMX](https://github.com/maxprograms-com/OpenXLIFF#export-approved-segments-as-tmx)**
+- **[Compare XLIFF files](https://github.com/maxprograms-com/OpenXLIFF#compare-xliff-files)**
 
 ## Filters Configuration
 
@@ -443,6 +444,36 @@ Where:
 ```
 
 If the optional `-tmx` parameter is not provided, the TMX file will be generated in the same folder as the XLIFF file and its name will be the same as the XLIFF file plus `.tmx`.
+
+## Compare XLIFF files
+
+Use class `com.maxprograms.validation.XliffComparer` from your Java code to compare two XLIFF files and generate a report of differences.
+
+Running `.\xliffcomparer.cmd` or `./xliffcomparer.sh` without parameters displays help for comparing two XLIFF files.
+
+```text
+Usage: 
+
+xliffcomparer.sh [-help] -file1 xliffFile1 -file2 xliffFile2 [-catalog catalogFile]
+
+Where:
+
+    -help:      (optional) Display this help information and exit
+    -file1:     First XLIFF file to compare
+    -file2:     Second XLIFF file to compare
+    -catalog:   (optional) XML catalog to use for processing
+    
+Compares two XLIFF files for semantic equivalence, ignoring:
+
+  - Skeleton file references and paths
+  - Whitespace and formatting differences
+  - Attribute order
+
+Exit codes:
+
+  0 - Files are equivalent
+  1 - Files differ or error occurred
+```
 
 ## Legal
 

@@ -61,7 +61,6 @@ public class XliffComparer {
         }
 
         if (file1.isEmpty() || file2.isEmpty()) {
-            logger.log(Level.ERROR, Messages.getString("XliffComparer.1"));
             help();
             return;
         }
@@ -228,7 +227,9 @@ public class XliffComparer {
     }
 
     private static void help() {
-        String help = Messages.getString("XliffComparer.help");
+        MessageFormat mf = new MessageFormat(Messages.getString("XliffComparer.help"));
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+        String help = mf.format(new String[] { isWindows ? "xliffcomparer.cmd" : "xliffcomparer.sh" });
         System.out.println(help);
     }
 }
