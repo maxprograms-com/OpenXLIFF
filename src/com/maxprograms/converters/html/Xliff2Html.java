@@ -43,12 +43,12 @@ import com.maxprograms.xml.XMLNode;
 
 public class Xliff2Html {
 
-	private static String xliffFile;
-	private static Map<String, Element> segments;
-	private static FileOutputStream output;
-	private static String encoding;
-	private static Map<String, String> entities;
-	private static Catalog catalog;
+	private String xliffFile;
+	private Map<String, Element> segments;
+	private FileOutputStream output;
+	private String encoding;
+	private Map<String, String> entities;
+	private Catalog catalog;
 
 	private Xliff2Html() {
 		// do not instantiate this class
@@ -56,6 +56,10 @@ public class Xliff2Html {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new Xliff2Html().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 
 		String sklFile = params.get("skeleton");
@@ -143,7 +147,7 @@ public class Xliff2Html {
 		return result;
 	}
 
-	private static String extractText(Element target) {
+	private String extractText(Element target) {
 		String result = "";
 		List<XMLNode> content = target.getContent();
 		for (XMLNode n : content) {
@@ -158,7 +162,7 @@ public class Xliff2Html {
 		return addEntities(result);
 	}
 
-	private static void loadEntities() throws SAXException, IOException, ParserConfigurationException {
+	private void loadEntities() throws SAXException, IOException, ParserConfigurationException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc = builder.build(Xliff2Html.class.getResource("entities.xml"));
 		Element root = doc.getRootElement();
@@ -171,7 +175,7 @@ public class Xliff2Html {
 		}
 	}
 
-	private static String addEntities(String text) {
+	private String addEntities(String text) {
 		StringBuilder result = new StringBuilder();
 		boolean inTag = false;
 		int start = text.indexOf('<');
@@ -229,11 +233,11 @@ public class Xliff2Html {
 		return result.toString();
 	}
 
-	private static void writeString(String string) throws IOException {
+	private void writeString(String string) throws IOException {
 		output.write(string.getBytes(encoding));
 	}
 
-	private static void loadSegments() throws SAXException, IOException, ParserConfigurationException {
+	private void loadSegments() throws SAXException, IOException, ParserConfigurationException {
 
 		SAXBuilder builder = new SAXBuilder();
 		if (catalog != null) {

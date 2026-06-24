@@ -49,12 +49,12 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Xliff2json {
 
-    private static Map<String, Element> segments;
-    private static String encoding;
-    private static boolean escaped;
-    private static boolean exportHTML;
-    private static Map<String, String> foundEntities;
-    private static List<String[]> entities;
+    private Map<String, Element> segments;
+    private String encoding;
+    private boolean escaped;
+    private boolean exportHTML;
+    private Map<String, String> foundEntities;
+    private List<String[]> entities;
 
     private Xliff2json() {
         // do not instantiate this class
@@ -62,6 +62,10 @@ public class Xliff2json {
     }
 
     public static List<String> run(Map<String, String> params) {
+        return new Xliff2json().convert(params);
+    }
+
+    private List<String> convert(Map<String, String> params) {
         List<String> result = new ArrayList<>();
         String sklFile = params.get("skeleton");
         String xliffFile = params.get("xliff");
@@ -126,7 +130,7 @@ public class Xliff2json {
         return result.toString();
     }
 
-    private static void loadSegments(String xliffFile, Catalog catalog)
+    private void loadSegments(String xliffFile, Catalog catalog)
             throws SAXException, IOException, ParserConfigurationException {
         SAXBuilder builder = new SAXBuilder();
         builder.setEntityResolver(catalog);
@@ -171,7 +175,7 @@ public class Xliff2json {
         }
     }
 
-    private static void parseJson(JSONObject json) throws IOException {
+    private void parseJson(JSONObject json) throws IOException {
         Iterator<String> keys = json.keys();
         while (keys.hasNext()) {
             String key = keys.next();
@@ -186,7 +190,7 @@ public class Xliff2json {
         }
     }
 
-    private static String parseText(String line) throws IOException {
+    private String parseText(String line) throws IOException {
         int index = line.indexOf("%%%");
         while (index != -1) {
             String code = line.substring(index + 3, line.indexOf("%%%", index + 1));
@@ -213,7 +217,7 @@ public class Xliff2json {
         return line;
     }
 
-    private static void parseArray(JSONArray array) throws IOException {
+    private void parseArray(JSONArray array) throws IOException {
         for (int i = 0; i < array.length(); i++) {
             Object obj = array.get(i);
             if (obj instanceof String) {
@@ -226,7 +230,7 @@ public class Xliff2json {
         }
     }
 
-    private static String extractText(Element element, boolean restoreCrlf) {
+    private String extractText(Element element, boolean restoreCrlf) {
         StringBuilder result = new StringBuilder();
         List<XMLNode> content = element.getContent();
         for (XMLNode n : content) {
@@ -256,7 +260,7 @@ public class Xliff2json {
         return result.toString();
     }
 
-    private static String replaceEntities(String string) {
+    private String replaceEntities(String string) {
         if (string.isEmpty()) {
             return string;
         }

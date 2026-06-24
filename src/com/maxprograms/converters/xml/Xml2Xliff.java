@@ -59,7 +59,7 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Xml2Xliff {
 
-	private static Logger logger = System.getLogger(Xml2Xliff.class.getName());
+	private static final Logger logger = System.getLogger(Xml2Xliff.class.getName());
 
 	static final String DOUBLEPRIME = "\u2033";
 	static final String MATHLT = "\u2039";

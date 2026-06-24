@@ -44,34 +44,34 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Html2Xliff {
 
-	private static String inputFile;
-	private static String skeletonFile;
-	private static String sourceLanguage;
-	private static String srcEncoding;
+	private String inputFile;
+	private String skeletonFile;
+	private String sourceLanguage;
+	private String srcEncoding;
 
-	private static FileOutputStream output;
-	private static FileOutputStream skeleton;
+	private FileOutputStream output;
+	private FileOutputStream skeleton;
 
-	private static int segId;
-	private static int tagId;
+	private int segId;
+	private int tagId;
 
-	private static List<String> segments;
-	private static List<String> startsSegment = List.of("address", "article", "aside", "blockquote", "br",
+	private List<String> segments;
+	private static final List<String> startsSegment = List.of("address", "article", "aside", "blockquote", "br",
 			"details", "dialog", "dd", "div", "dl", "dt", "fieldset", "figcaption", "figure", "footer", "form", "h1",
 			"h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "html", "label", "li", "main", "meta", "nav", "ol",
 			"p", "pre", "script", "section", "table", "td", "tr", "ul");
-	private static Map<String, List<String>> translatableAttributes;
-	private static Map<String, String> entities;
-	private static Map<String, String> ctypes;
+	private Map<String, List<String>> translatableAttributes;
+	private Map<String, String> entities;
+	private Map<String, String> ctypes;
 
-	private static boolean segByElement;
-	private static boolean keepFormat;
+	private boolean segByElement;
+	private boolean keepFormat;
 
-	private static String first;
-	private static String last;
-	private static String targetLanguage;
+	private String first;
+	private String last;
+	private String targetLanguage;
 
-	private static SAXBuilder builder;
+	private SAXBuilder builder;
 
 	private Html2Xliff() {
 		// do not instantiate this class
@@ -79,6 +79,10 @@ public class Html2Xliff {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new Html2Xliff().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 
 		inputFile = params.get("source");
@@ -140,7 +144,7 @@ public class Html2Xliff {
 		return result;
 	}
 
-	private static void writeHeader() throws IOException {
+	private void writeHeader() throws IOException {
 		String tgtLang = "";
 		if (targetLanguage != null) {
 			tgtLang = "\" target-language=\"" + targetLanguage;
@@ -163,7 +167,7 @@ public class Html2Xliff {
 		writeString("<body>\n");
 	}
 
-	private static void processList(Segmenter segmenter)
+	private void processList(Segmenter segmenter)
 			throws IOException, SAXException, ParserConfigurationException {
 		for (int i = 0; i < segments.size(); i++) {
 			String text = segments.get(i);
@@ -176,7 +180,7 @@ public class Html2Xliff {
 		}
 	}
 
-	private static void extractSegment(Segmenter segmenter, String seg)
+	private void extractSegment(Segmenter segmenter, String seg)
 			throws IOException, SAXException, ParserConfigurationException {
 
 		// start by making a smaller list
@@ -272,7 +276,7 @@ public class Html2Xliff {
 		writeSkeleton(trail);
 	}
 
-	private static void writeSegment(String segment) throws IOException, SAXException, ParserConfigurationException {
+	private void writeSegment(String segment) throws IOException, SAXException, ParserConfigurationException {
 		segment = segment.replace("\u2029", "");
 		String pure = removePH(segment);
 		if (pure.trim().isEmpty()) {
@@ -303,7 +307,7 @@ public class Html2Xliff {
 		writeSkeleton("%%%" + segId++ + "%%%\n" + last);
 	}
 
-	private static String segmentCleanup(String segment)
+	private String segmentCleanup(String segment)
 			throws SAXException, IOException, ParserConfigurationException {
 		ByteArrayInputStream stream = new ByteArrayInputStream(
 				("<x>" + segment + "</x>").getBytes(StandardCharsets.UTF_8));
@@ -346,7 +350,7 @@ public class Html2Xliff {
 		return es.substring(3, es.length() - 4);
 	}
 
-	private static String phContent(String segment) throws SAXException, IOException, ParserConfigurationException {
+	private String phContent(String segment) throws SAXException, IOException, ParserConfigurationException {
 		ByteArrayInputStream stream = new ByteArrayInputStream(
 				("<x>" + segment + "</x>").getBytes(StandardCharsets.UTF_8));
 		Document d = builder.build(stream);
@@ -364,7 +368,7 @@ public class Html2Xliff {
 		return result;
 	}
 
-	private static String removePH(String segment) throws SAXException, IOException, ParserConfigurationException {
+	private String removePH(String segment) throws SAXException, IOException, ParserConfigurationException {
 		ByteArrayInputStream stream = new ByteArrayInputStream(
 				("<x>" + segment + "</x>").getBytes(StandardCharsets.UTF_8));
 		Document d = builder.build(stream);
@@ -400,7 +404,7 @@ public class Html2Xliff {
 		return rs;
 	}
 
-	private static String addTags(String src) {
+	private String addTags(String src) {
 		String result = "";
 		int start = src.indexOf('<');
 		int end = src.indexOf('>');
@@ -453,7 +457,7 @@ public class Html2Xliff {
 		return result;
 	}
 
-	private static String tag(String element) {
+	private String tag(String element) {
 		String result = "";
 		String type = getType(element);
 
@@ -476,7 +480,7 @@ public class Html2Xliff {
 		return result;
 	}
 
-	private static String cleanString(String s) {
+	private String cleanString(String s) {
 		int control = s.indexOf('&');
 		while (control != -1) {
 			int sc = s.indexOf(';', control);
@@ -540,15 +544,15 @@ public class Html2Xliff {
 		return s;
 	}
 
-	private static void writeSkeleton(String string) throws IOException {
+	private void writeSkeleton(String string) throws IOException {
 		skeleton.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void writeString(String string) throws IOException {
+	private void writeString(String string) throws IOException {
 		output.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static boolean isTranslateable(String string) {
+	private boolean isTranslateable(String string) {
 
 		keepFormat = false;
 
@@ -752,7 +756,7 @@ public class Html2Xliff {
 		return false;
 	}
 
-	private static void updateAttributes(String type, String fragment) {
+	private void updateAttributes(String type, String fragment) {
 		Map<String, Attribute> atts = attributesMap(fragment);
 		if ("meta".equalsIgnoreCase(type)) {
 			if (atts.containsKey("name")) {
@@ -832,7 +836,7 @@ public class Html2Xliff {
 		return atts;
 	}
 
-	private static String extractAttributes(String type, String element) {
+	private String extractAttributes(String type, String element) {
 		String ctype = "";
 		if (ctypes.containsKey(type)) {
 			ctype = " ctype=\"" + ctypes.get(type) + "\"";
@@ -884,7 +888,7 @@ public class Html2Xliff {
 		return result;
 	}
 
-	private static void buildTables() throws SAXException, IOException, ParserConfigurationException {
+	private void buildTables() throws SAXException, IOException, ParserConfigurationException {
 		translatableAttributes = new HashMap<>();
 		entities = new HashMap<>();
 		ctypes = new HashMap<>();
@@ -901,7 +905,7 @@ public class Html2Xliff {
 		}
 	}
 
-	private static void buildList(String file) throws IOException {
+	private void buildList(String file) throws IOException {
 		segments = new ArrayList<>();
 		int start = file.indexOf('<');
 		int end = file.indexOf('>');

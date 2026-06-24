@@ -43,7 +43,7 @@ import com.maxprograms.xml.XMLOutputter;
 
 public class Xliff2Qtip {
 
-    private static ZipOutputStream out;
+    private ZipOutputStream out;
 
     private Xliff2Qtip() {
         // do not instantiate this class
@@ -51,6 +51,10 @@ public class Xliff2Qtip {
     }
 
     public static List<String> run(Map<String, String> params) {
+        return new Xliff2Qtip().convert(params);
+    }
+
+    private List<String> convert(Map<String, String> params) {
         List<String> result = new ArrayList<>();
         Map<String, String> filesMap = new HashMap<>();
 
@@ -168,7 +172,7 @@ public class Xliff2Qtip {
         return result;
     }
 
-    private static void saveEntry(String name, String file) throws IOException {
+    private void saveEntry(String name, String file) throws IOException {
         ZipEntry content = new ZipEntry(name);
         content.setMethod(ZipEntry.DEFLATED);
         out.putNextEntry(content);

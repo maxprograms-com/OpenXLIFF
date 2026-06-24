@@ -23,26 +23,26 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Xliff1xProcessor {
 
-    private static int tag;
-    private static int fileIndex;
-    private static boolean preserveSpaces = false;
+    private int tag;
+    private int fileIndex;
+    private boolean preserveSpaces = false;
 
-    private Xliff1xProcessor() {
+    public Xliff1xProcessor() {
         // do not instantiate this class
         // use static methods instead
     }
 
-    public static void resetFileIndex() {
+    public void resetFileIndex() {
         fileIndex = 0;
     }
 
-    public static void processXliff1x(Element root, List<Element> units) {
+    public void processXliff1x(Element root, List<Element> units) {
         tag = 1;
         preserveSpaces = false;
         recurse1x(root, units);
     }
 
-    private static void recurse1x(Element root, List<Element> units) {
+    private void recurse1x(Element root, List<Element> units) {
         if ("file".equals(root.getName())) {
             fileIndex++;
         }
@@ -191,7 +191,7 @@ public class Xliff1xProcessor {
         return null;
     }
 
-    private static List<XMLNode> getContent1x(Element child) {
+    private List<XMLNode> getContent1x(Element child) {
         List<XMLNode> result = new Vector<>();
         if (child != null) {
             List<XMLNode> content = child.getContent();

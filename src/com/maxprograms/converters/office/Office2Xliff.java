@@ -50,10 +50,10 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Office2Xliff {
 
-	private static Element mergedRoot;
-	private static String inputFile;
-	private static String skeleton;
-	private static boolean isPPTX;
+	private Element mergedRoot;
+	private String inputFile;
+	private String skeleton;
+	private boolean isPPTX;
 
 	private Office2Xliff() {
 		// do not instantiate this class
@@ -61,6 +61,10 @@ public class Office2Xliff {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new Office2Xliff().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 
 		inputFile = params.get("source");
@@ -246,7 +250,7 @@ public class Office2Xliff {
 		}
 	}
 
-	private static void sortSlides() {
+	private void sortSlides() {
 		List<Element> files = mergedRoot.getChildren("file");
 		List<PI> instructions = mergedRoot.getPI();
 		Map<String, String> table = new HashMap<>();
@@ -339,7 +343,7 @@ public class Office2Xliff {
 		}
 	}
 
-	private static void addFile(String xliff) throws SAXException, IOException, ParserConfigurationException {
+	private void addFile(String xliff) throws SAXException, IOException, ParserConfigurationException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc = builder.build(xliff);
 		Element root = doc.getRootElement();
@@ -354,7 +358,7 @@ public class Office2Xliff {
 		mergedRoot.addContent(newFile);
 	}
 
-	private static void updateXliff(String xliff, String original)
+	private void updateXliff(String xliff, String original)
 			throws SAXException, IOException, ParserConfigurationException {
 		SAXBuilder builder = new SAXBuilder();
 		Document doc = builder.build(xliff);

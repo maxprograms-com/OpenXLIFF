@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutorService;
@@ -108,11 +107,22 @@ public class DitaParser {
 	private Map<Key, Set<String>> usedKeys;
 	private Set<String> recursed;
 	private Set<String> pendingRecurse;
-	private TreeSet<String> topicrefSet;
-	private TreeSet<String> topicSet;
-	private static TreeSet<String> xrefSet;
-	private static TreeSet<String> linkSet;
-	private static TreeSet<String> imageSet;
+	private static final Set<String> topicrefSet = Set.of("topicref", "abbrevlist", "amendments", "appendix",
+			"backmatter", "bibliolist", "bookabstract", "booklist", "booklists", "chapter", "colophon", "dedication",
+			"draftintro", "figurelist", "frontmatter", "glossarylist", "indexlist", "notices", "part", "preface",
+			"tablelist", "toc", "trademarklist", "anchorref", "keydef", "mapref", "topicgroup", "topichead",
+			"topicset", "topicsetref", "ditavalref", "glossref", "subjectref", "topicapply", "topicsubject",
+			"defaultSubject", "enumerationdef", "hasInstance", "hasKind", "hasNarrower", "hasPart", "hasRelated",
+			"relatedSubjects", "subjectdef", "subjectHead", "schemeref", "learningContentRef", "learningGroup",
+			"learningGroupMapRef", "learningObject", "learningObjectMapRef", "learningOverviewRef", "learningPlanRef",
+			"learningPostAssessmentRef", "learningPreAssessmentRef", "learningSummaryRef");
+	private static final Set<String> topicSet = Set.of("topic", "concept", "glossentry", "reference", "task",
+			"troubleshooting", "glossgroup", "learningAssessment", "learningBase", "learningContent",
+			"learningOverview", "learningSummary", "learningPlan");
+	private static final Set<String> xrefSet = Set.of("xref", "glossAlternateFor", "coderef", "fragref",
+			"synnoteref", "mathmlref", "svgref");
+	private static final Set<String> linkSet = Set.of("link");
+	private static final Set<String> imageSet = Set.of("image", "glossSymbol", "hazardsymbol");
 	private List<String> ignored;
 	private Map<StringArray, Element> referenceChache;
 	private Catalog catalog;
@@ -716,97 +726,18 @@ public class DitaParser {
 	}
 
 	public static boolean isImage(String name) {
-		if (imageSet == null) {
-			imageSet = new TreeSet<>();
-			imageSet.add("image");
-			imageSet.add("glossSymbol");
-			imageSet.add("hazardsymbol");
-		}
 		return imageSet.contains(name);
 	}
 
 	public static boolean isLink(String name) {
-		if (linkSet == null) {
-			linkSet = new TreeSet<>();
-			linkSet.add("link");
-		}
 		return linkSet.contains(name);
 	}
 
 	public static boolean isXref(String name) {
-		if (xrefSet == null) {
-			xrefSet = new TreeSet<>();
-			xrefSet.add("xref");
-			xrefSet.add("glossAlternateFor");
-			xrefSet.add("coderef");
-			xrefSet.add("fragref");
-			xrefSet.add("synnoteref");
-			xrefSet.add("mathmlref");
-			xrefSet.add("svgref");
-		}
 		return xrefSet.contains(name);
 	}
 
 	private boolean isTopicref(String name) {
-		if (topicrefSet == null) {
-			topicrefSet = new TreeSet<>();
-			topicrefSet.add("topicref");
-			topicrefSet.add("abbrevlist");
-			topicrefSet.add("amendments");
-			topicrefSet.add("appendix");
-			topicrefSet.add("backmatter");
-			topicrefSet.add("bibliolist");
-			topicrefSet.add("bookabstract");
-			topicrefSet.add("booklist");
-			topicrefSet.add("booklists");
-			topicrefSet.add("chapter");
-			topicrefSet.add("colophon");
-			topicrefSet.add("dedication");
-			topicrefSet.add("draftintro");
-			topicrefSet.add("figurelist");
-			topicrefSet.add("frontmatter");
-			topicrefSet.add("glossarylist");
-			topicrefSet.add("indexlist");
-			topicrefSet.add("notices");
-			topicrefSet.add("part");
-			topicrefSet.add("preface");
-			topicrefSet.add("tablelist");
-			topicrefSet.add("toc");
-			topicrefSet.add("trademarklist");
-			topicrefSet.add("anchorref");
-			topicrefSet.add("keydef");
-			topicrefSet.add("mapref");
-			topicrefSet.add("topicgroup");
-			topicrefSet.add("topichead");
-			topicrefSet.add("topicset");
-			topicrefSet.add("topicsetref");
-			topicrefSet.add("ditavalref");
-			topicrefSet.add("glossref");
-			topicrefSet.add("subjectref");
-			topicrefSet.add("topicapply");
-			topicrefSet.add("topicsubject");
-			topicrefSet.add("defaultSubject");
-			topicrefSet.add("enumerationdef");
-			topicrefSet.add("hasInstance");
-			topicrefSet.add("hasKind");
-			topicrefSet.add("hasNarrower");
-			topicrefSet.add("hasPart");
-			topicrefSet.add("hasRelated");
-			topicrefSet.add("relatedSubjects");
-			topicrefSet.add("subjectdef");
-			topicrefSet.add("subjectHead");
-			topicrefSet.add("schemeref");
-			topicrefSet.add("learningContentRef");
-			topicrefSet.add("learningGroup");
-			topicrefSet.add("learningGroupMapRef");
-			topicrefSet.add("learningObject");
-			topicrefSet.add("learningObjectMapRef");
-			topicrefSet.add("learningOverviewRef");
-			topicrefSet.add("learningPlanRef");
-			topicrefSet.add("learningPostAssessmentRef");
-			topicrefSet.add("learningPreAssessmentRef");
-			topicrefSet.add("learningSummaryRef");
-		}
 		return topicrefSet.contains(name);
 	}
 
@@ -986,22 +917,6 @@ public class DitaParser {
 	}
 
 	private boolean isTopic(String name) {
-		if (topicSet == null) {
-			topicSet = new TreeSet<>();
-			topicSet.add("topic");
-			topicSet.add("concept");
-			topicSet.add("glossentry");
-			topicSet.add("reference");
-			topicSet.add("task");
-			topicSet.add("troubleshooting");
-			topicSet.add("glossgroup");
-			topicSet.add("learningAssessment");
-			topicSet.add("learningBase");
-			topicSet.add("learningContent");
-			topicSet.add("learningOverview");
-			topicSet.add("learningSummary");
-			topicSet.add("learningPlan");
-		}
 		return topicSet.contains(name);
 	}
 

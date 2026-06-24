@@ -36,7 +36,6 @@ import com.maxprograms.converters.Constants;
 import com.maxprograms.converters.Convert;
 import com.maxprograms.converters.FileFormats;
 import com.maxprograms.converters.Join;
-import com.maxprograms.converters.sdlppx.Sdlppx2Xliff;
 import com.maxprograms.xml.Catalog;
 import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
@@ -48,11 +47,20 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Qtip2Xliff {
 
-    private static String inputFile;
-    private static String skeleton;
-    private static ZipOutputStream out;
+    private String inputFile;
+    private String skeleton;
+    private ZipOutputStream out;
+
+    private Qtip2Xliff() {
+        // do not instantiate this class
+        // use run method instead
+    }
 
     public static List<String> run(Map<String, String> params) {
+        return new Qtip2Xliff().convert(params);
+    }
+
+    private List<String> convert(Map<String, String> params) {
 
         List<String> result = new ArrayList<>();
 
@@ -159,7 +167,7 @@ public class Qtip2Xliff {
 
             result.add(Constants.SUCCESS);
         } catch (IOException | SAXException | ParserConfigurationException | URISyntaxException e) {
-            Logger logger = System.getLogger(Sdlppx2Xliff.class.getName());
+            Logger logger = System.getLogger(Qtip2Xliff.class.getName());
             logger.log(Level.ERROR, Messages.getString("Qtip2Xliff.2"), e);
             result.add(Constants.ERROR);
             result.add(e.getMessage());
@@ -167,7 +175,7 @@ public class Qtip2Xliff {
         return result;
     }
 
-    private static void saveEntry(ZipEntry entry, String name) throws IOException {
+    private void saveEntry(ZipEntry entry, String name) throws IOException {
         ZipEntry content = new ZipEntry(entry.getName());
         content.setMethod(ZipEntry.DEFLATED);
         out.putNextEntry(content);
@@ -181,7 +189,7 @@ public class Qtip2Xliff {
         }
     }
 
-    private static void updateXliff(String xliff, String original)
+    private void updateXliff(String xliff, String original)
             throws SAXException, IOException, ParserConfigurationException {
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(xliff);

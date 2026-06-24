@@ -46,12 +46,12 @@ public class ToXliff2 {
 
 	private static Logger logger = System.getLogger(ToXliff2.class.getName());
 
-	private static Element root2;
-	private static int fileId;
-	private static int mrkCount;
-	private static boolean xliffUpgrade = false;
+	private Element root2;
+	private int fileId;
+	private int mrkCount;
+	private boolean xliffUpgrade;
 
-	private static List<String> preserveAttributes = List.of("reformat", "datatype", "ts", "phase-name",
+	private static final List<String> preserveAttributes = List.of("reformat", "datatype", "ts", "phase-name",
 			"restype", "resname", "extradata", "help-id", "menu", "menu-option", "menu-name", "coord", "font",
 			"css-style", "style", "exstyle", "extype", "maxbytes", "minbytes", "size-unit", "maxheight", "minheight",
 			"maxwidth", "minwidth", "charclass");
@@ -122,14 +122,15 @@ public class ToXliff2 {
 	}
 
 	public static List<String> run(String sourceFile, String outputFile, String catalog, String version, boolean upgrade) {
-		xliffUpgrade = upgrade;
 		List<String> result = new ArrayList<>();
 		if (!List.of("2.0", "2.1", "2.2").contains(version)) {
 			result.add(Constants.ERROR);
 			result.add(Messages.getString("ToXliff2.1"));
 			return result;
 		}
-		fileId = 1;
+		ToXliff2 converter = new ToXliff2();
+		converter.xliffUpgrade = upgrade;
+		converter.fileId = 1;
 		try {
 			SAXBuilder builder = new SAXBuilder();
 			builder.setEntityResolver(CatalogBuilder.getCatalog(catalog));
@@ -141,13 +142,13 @@ public class ToXliff2 {
 				return result;
 			}
 			Document xliff2 = new Document(null, "xliff", null, null);
-			root2 = xliff2.getRootElement();
-			recurse(root, root2);
-			root2.setAttribute("version", version);
+			converter.root2 = xliff2.getRootElement();
+			converter.recurse(root, converter.root2);
+			converter.root2.setAttribute("version", version);
 			if (version.equals("2.2")) {
-				root2.setAttribute("xmlns", "urn:oasis:names:tc:xliff:document:2.2");
+				converter.root2.setAttribute("xmlns", "urn:oasis:names:tc:xliff:document:2.2");
 			}
-			Indenter.indent(root2, 2);
+			Indenter.indent(converter.root2, 2);
 			XMLOutputter outputter = new XMLOutputter();
 			outputter.preserveSpace(true);
 			try (FileOutputStream out = new FileOutputStream(new File(outputFile))) {
@@ -164,7 +165,7 @@ public class ToXliff2 {
 		return result;
 	}
 
-	private static void recurse(Element source, Element target)
+	private void recurse(Element source, Element target)
 			throws SAXException, IOException, ParserConfigurationException {
 		if (source.getName().equals("xliff")) {
 			target.setAttribute("xmlns", "urn:oasis:names:tc:xliff:document:2.0");
@@ -690,7 +691,7 @@ public class ToXliff2 {
 		}
 	}
 
-	private static List<XMLNode> harvestContent(Element e, Element tagAttributes) throws SAXException, IOException {
+	private List<XMLNode> harvestContent(Element e, Element tagAttributes) throws SAXException, IOException {
 		if ("sub".equals(e.getName())) {
 			throw new SAXException(Messages.getString("ToXliff2.3"));
 		}

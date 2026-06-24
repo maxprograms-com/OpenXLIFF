@@ -67,13 +67,13 @@ import com.maxprograms.xml.XMLNode;
 
 public class Merge {
 
-	private static Logger logger = System.getLogger(Merge.class.getName());
+	private static final Logger logger = System.getLogger(Merge.class.getName());
 
-	private static List<Element> segments;
-	protected static HashSet<String> fileSet;
+	private List<Element> segments;
+	protected HashSet<String> fileSet;
 
-	private static Document doc;
-	private static Element root;
+	private Document doc;
+	private Element root;
 
 	public static void main(String[] args) {
 		String xliff = "";
@@ -198,6 +198,10 @@ public class Merge {
 	}
 
 	public static List<String> merge(String xliff, String target, String catalog, boolean acceptUnaproved, String maxThreads) {
+		return new Merge().doMerge(xliff, target, catalog, acceptUnaproved, maxThreads);
+	}
+
+	private List<String> doMerge(String xliff, String target, String catalog, boolean acceptUnaproved, String maxThreads) {
 		List<String> result = new ArrayList<>();
 		try {
 			loadXliff(xliff, catalog);
@@ -310,7 +314,7 @@ public class Merge {
 		}
 	}
 
-	protected static void loadXliff(String fileName, String catalog)
+	protected void loadXliff(String fileName, String catalog)
 			throws SAXException, IOException, ParserConfigurationException, URISyntaxException {
 		SAXBuilder builder = new SAXBuilder();
 		builder.setEntityResolver(CatalogBuilder.getCatalog(catalog));
@@ -321,7 +325,7 @@ public class Merge {
 		}
 	}
 
-	private static void removeAltTrans(Element e) {
+	private void removeAltTrans(Element e) {
 		if (e.getName().equals("trans-unit")) {
 			e.removeChild("alt-trans");
 			segments.add(e);
@@ -332,7 +336,7 @@ public class Merge {
 		}
 	}
 
-	private static String[] saveXliff(String fileName, File xliff) throws IOException {
+	private String[] saveXliff(String fileName, File xliff) throws IOException {
 		String encoding = "";
 		String dataType = "";
 		try (FileOutputStream out = new FileOutputStream(xliff)) {
@@ -361,7 +365,7 @@ public class Merge {
 		out.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static List<String> run(Map<String, String> params) {
+	private List<String> run(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 		File temporary = null;
 		try {
@@ -453,7 +457,7 @@ public class Merge {
 		return result;
 	}
 
-	private static String getSkeleton() throws IOException {
+	private String getSkeleton() throws IOException {
 		String result = "";
 		Element file = root.getChild("file");
 		Element header = null;

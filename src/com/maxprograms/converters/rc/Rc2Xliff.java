@@ -30,13 +30,13 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Rc2Xliff {
 
-	private static InputStreamReader buffer;
-	private static FileOutputStream output;
-	private static FileOutputStream skeleton;
-	private static String lastWord = "";
-	private static int segId;
-	private static String stack;
-	private static int blockStack;
+	private InputStreamReader buffer;
+	private FileOutputStream output;
+	private FileOutputStream skeleton;
+	private String lastWord = "";
+	private int segId;
+	private String stack;
+	private int blockStack;
 
 	private Rc2Xliff() {
 		// do not instantiate this class
@@ -44,6 +44,10 @@ public class Rc2Xliff {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new Rc2Xliff().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 		segId = 0;
 		String inputFile = params.get("source");
@@ -101,19 +105,19 @@ public class Rc2Xliff {
 		return result;
 	}
 
-	private static void writeString(String string) throws IOException {
+	private void writeString(String string) throws IOException {
 		output.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void writeSkeleton(String string) throws IOException {
+	private void writeSkeleton(String string) throws IOException {
 		skeleton.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void writeSkeleton(char character) throws IOException {
+	private void writeSkeleton(char character) throws IOException {
 		writeSkeleton(String.valueOf(character));
 	}
 
-	private static void writeSegment(String segment) throws IOException {
+	private void writeSegment(String segment) throws IOException {
 		if (segment.isEmpty()) {
 			return;
 		}
@@ -122,7 +126,7 @@ public class Rc2Xliff {
 		writeSkeleton("%%%" + segId++ + "%%%");
 	}
 
-	private static void parseRC() throws IOException {
+	private void parseRC() throws IOException {
 		char character;
 		while (buffer.ready()) {
 			character = (char) buffer.read();
@@ -139,7 +143,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseComment() throws IOException {
+	private void parseComment() throws IOException {
 		writeSkeleton("/"); // Last character read
 
 		boolean bLargeComment;
@@ -177,7 +181,7 @@ public class Rc2Xliff {
 		return word.trim().equals("END") || word.trim().equals("}");
 	}
 
-	private static void parseStatement(char initial) throws IOException {
+	private void parseStatement(char initial) throws IOException {
 		String statement = String.valueOf(initial);
 		writeSkeleton(initial);
 		statement = statement.concat(parseWords(" ,\n\r\t", true, false));
@@ -197,7 +201,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseDirective() throws IOException {
+	private void parseDirective() throws IOException {
 		char character = ' ';
 		writeSkeleton('#');
 		String statement = parseWords(" \t", true, false);
@@ -211,7 +215,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseDefine() throws IOException {
+	private void parseDefine() throws IOException {
 		String word = "";
 		while (buffer.ready()) {
 			stack = "";
@@ -227,7 +231,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseBlock() throws IOException {
+	private void parseBlock() throws IOException {
 		blockStack++;
 		String statement = "";
 		while (blockStack != 0 && buffer.ready()) {
@@ -240,12 +244,12 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseDialog() throws IOException {
+	private void parseDialog() throws IOException {
 		parseDialogContent();
 		parseControlBlock();
 	}
 
-	private static void parseDialogContent() throws IOException {
+	private void parseDialogContent() throws IOException {
 		String word = " ";
 		while (!beginBlock(word)) {
 			word = parseWords(" \n\t\r(),", true, false);
@@ -255,7 +259,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseControlBlock() throws IOException {
+	private void parseControlBlock() throws IOException {
 		boolean isEnd = false;
 		parseWords(" (),\r\n\t", true, false);
 		do {
@@ -296,7 +300,7 @@ public class Rc2Xliff {
 	}
 
 	// return true if it has a block in the control
-	private static boolean parseControlTypeI() throws IOException {
+	private boolean parseControlTypeI() throws IOException {
 		char cIni = ' ';
 		while (blankChar(cIni) && buffer.ready()) {
 			cIni = (char) buffer.read();
@@ -331,7 +335,7 @@ public class Rc2Xliff {
 		return !hasBlock && endBlock(word);// end of control block?
 	}
 
-	private static void writeConditional(char character, boolean write) throws IOException {
+	private void writeConditional(char character, boolean write) throws IOException {
 		if (write) {
 			writeSkeleton(character);
 		} else {
@@ -340,7 +344,7 @@ public class Rc2Xliff {
 
 	}
 
-	private static void parseComment(boolean write, boolean large) throws IOException {
+	private void parseComment(boolean write, boolean large) throws IOException {
 		writeConditional('/', write); // Last character read
 		if (large) {
 			writeConditional('*', write);
@@ -365,7 +369,7 @@ public class Rc2Xliff {
 
 	}
 
-	private static String parseWords(String separators, boolean write, boolean withSeparator) throws IOException {
+	private String parseWords(String separators, boolean write, boolean withSeparator) throws IOException {
 		String word = "";
 		char lastChar;
 		char character = 'a'; // initial value any character not in separators
@@ -444,7 +448,7 @@ public class Rc2Xliff {
 		return word;
 	}
 
-	private static void captureString(boolean startNow) throws IOException {
+	private void captureString(boolean startNow) throws IOException {
 		int quotes = 0;
 		if (startNow) {
 			quotes = 1; // now in the string
@@ -499,7 +503,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseStringTable() throws IOException {
+	private void parseStringTable() throws IOException {
 		String word = " ";
 		while (!beginBlock(word)) {
 			word = parseWords(" \n\t\r,", true, false);
@@ -516,7 +520,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parseMenu() throws IOException {
+	private void parseMenu() throws IOException {
 		String word = " ";
 		while (!beginBlock(word)) {
 			word = parseWords(" \n\t\r,", true, false);
@@ -524,7 +528,7 @@ public class Rc2Xliff {
 		parseMenuBlock();
 	}
 
-	private static void parseMenuBlock() throws IOException {
+	private void parseMenuBlock() throws IOException {
 		String word = " ";
 		while (!endBlock(word)) {
 			word = parseWords(" ,\n\t\r\"", false, true);
@@ -553,7 +557,7 @@ public class Rc2Xliff {
 		}
 	}
 
-	private static void parsePopup() throws IOException {
+	private void parsePopup() throws IOException {
 		String word = " ";
 
 		while (!beginBlock(word)) {
@@ -570,7 +574,7 @@ public class Rc2Xliff {
 		parseMenuBlock();
 	}
 
-	private static void parseDlgInit() throws IOException {
+	private void parseDlgInit() throws IOException {
 		String word = "";
 		while (buffer.ready() && !beginBlock(word)) {
 			word = parseWords(" \n\t\r,", true, false);
@@ -579,7 +583,7 @@ public class Rc2Xliff {
 		parseDlgInitBlock();
 	}
 
-	private static void parseDlgInitBlock() throws IOException {
+	private void parseDlgInitBlock() throws IOException {
 		String word = "";
 		int position = 0; // parse position in the dlginitblock
 		int dataLength = 0;
@@ -642,7 +646,7 @@ public class Rc2Xliff {
 		stack = "";
 	}
 
-	private static void extractString(String ini, int dataLength) throws IOException {
+	private void extractString(String ini, int dataLength) throws IOException {
 		byte[] array = new byte[dataLength];
 		String word = "";
 		int i = 1;

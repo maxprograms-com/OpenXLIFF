@@ -46,7 +46,7 @@ public class Join {
 		// do not instantiate this class
 	}
 
-	private static Logger logger = System.getLogger(Join.class.getName());
+	private static final Logger logger = System.getLogger(Join.class.getName());
 
 	private static List<String> list;
 	private static String target = "";

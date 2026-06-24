@@ -45,8 +45,8 @@ public class Xliff2Office {
 
 	private static Logger logger = System.getLogger(Xliff2Office.class.getName());
 
-	private static Map<String, String> filesTable;
-	private static boolean isEmbedded = false;
+	private Map<String, String> filesTable;
+	private boolean isEmbedded = false;
 
 	private Xliff2Office() {
 		// do not instantiate this class
@@ -54,6 +54,11 @@ public class Xliff2Office {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		Xliff2Office converter = new Xliff2Office();
+		return converter.convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 		String xliffFile = params.get("xliff");
 		String outputFile = params.get("backfile");
@@ -195,7 +200,7 @@ public class Xliff2Office {
 		}
 	}
 
-	private static void saveFile(Element element, String xliffFile) throws IOException {
+	private void saveFile(Element element, String xliffFile) throws IOException {
 		Document doc = new Document(null, "xliff", null, null);
 		Element root = doc.getRootElement();
 		root.setAttribute("version", "1.2");

@@ -28,26 +28,26 @@ import com.maxprograms.xml.XMLUtils;
 
 public class Po2Xliff {
 
-	private static FileOutputStream output;
-	private static FileOutputStream skeleton;
+	private FileOutputStream output;
+	private FileOutputStream skeleton;
 
-	private static String source;
-	private static String target;
-	private static String comment;
-	private static String context;
-	private static String reference;
-	private static String flags;
-	private static boolean fuzzy;
-	private static boolean cformat;
+	private String source;
+	private String target;
+	private String comment;
+	private String context;
+	private String reference;
+	private String flags;
+	private boolean fuzzy;
+	private boolean cformat;
 
-	private static int segId;
-	private static int domainId;
-	private static int contextId = 1;
-	private static int refId = 1;
-	private static String newContext;
-	private static List<String> pluralTargets;
-	private static int plurals;
-	private static String pluralSource;
+	private int segId;
+	private int domainId;
+	private int contextId = 1;
+	private int refId = 1;
+	private String newContext;
+	private List<String> pluralTargets;
+	private int plurals;
+	private String pluralSource;
 
 	private Po2Xliff() {
 		// do not instantiate this class
@@ -55,6 +55,10 @@ public class Po2Xliff {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new Po2Xliff().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 
 		String inputFile = params.get("source");
@@ -268,21 +272,21 @@ public class Po2Xliff {
 		return result;
 	}
 
-	private static void parsePlural(String line) {
+	private void parsePlural(String line) {
 		String string = line.substring(line.indexOf("nplurals") + 8).trim();
 		String number = string.substring(string.indexOf('=') + 1, string.indexOf(';'));
 		plurals = Integer.parseInt(number);
 	}
 
-	private static void writeString(String string) throws IOException {
+	private void writeString(String string) throws IOException {
 		output.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void writeSkeleton(String string) throws IOException {
+	private void writeSkeleton(String string) throws IOException {
 		skeleton.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void writeSegment() throws IOException {
+	private void writeSegment() throws IOException {
 		if (!pluralSource.isEmpty()) {
 			writeString("   <group restype=\"x-gettext-plurals\" id=\"" + segId + "\">\n");
 			if (!context.isEmpty()) {
@@ -454,7 +458,7 @@ public class Po2Xliff {
 		return result;
 	}
 
-	private static void parseReference(String ref) throws IOException {
+	private void parseReference(String ref) throws IOException {
 		if (ref.trim().isEmpty()) {
 			return;
 		}

@@ -47,21 +47,22 @@ public class MSOffice2Xliff {
 
 	private static final String ATTRIBUTE_RESTYPE = "x-attribute";
 
-	private static String inputFile;
-	private static String skeletonFile;
-	private static String sourceLanguage;
-	private static String targetLanguage;
-	private static String text = "";
-	static boolean inBody = false;
+	private static final Pattern pattern = Pattern.compile(
+			"&lt;[A-Za-z0-9]+([\\s][A-Za-z\\-\\.]+=[\"|\'][^<&>]*[\"|\'])*[\\s]*/?&gt;");
+	private static final Pattern endPattern = Pattern.compile("&lt;/[A-Za-z0-9]+&gt;");
 
-	private static FileOutputStream out;
-	private static FileOutputStream skel;
-	private static int segnum;
-	private static boolean segByElement;
-	private static String srcEncoding;
+	private String inputFile;
+	private String skeletonFile;
+	private String sourceLanguage;
+	private String targetLanguage;
+	private String text = "";
+	boolean inBody = false;
 
-	private static Pattern pattern;
-	private static Pattern endPattern;
+	private FileOutputStream out;
+	private FileOutputStream skel;
+	private int segnum;
+	private boolean segByElement;
+	private String srcEncoding;
 
 	private MSOffice2Xliff() {
 		// do not instantiate this class
@@ -69,6 +70,10 @@ public class MSOffice2Xliff {
 	}
 
 	public static List<String> run(Map<String, String> params) {
+		return new MSOffice2Xliff().convert(params);
+	}
+
+	private List<String> convert(Map<String, String> params) {
 		List<String> result = new ArrayList<>();
 
 		inputFile = params.get("source");
@@ -112,7 +117,7 @@ public class MSOffice2Xliff {
 		return result;
 	}
 
-	private static void writeHeader() throws IOException {
+	private void writeHeader() throws IOException {
 		String tgtLang = "";
 		if (targetLanguage != null) {
 			tgtLang = "\" target-language=\"" + targetLanguage;
@@ -134,12 +139,12 @@ public class MSOffice2Xliff {
 		writeOut("    <body>\n");
 	}
 
-	private static void writeSegment(String sourceText)
+	private void writeSegment(String sourceText)
 			throws IOException, SAXException, ParserConfigurationException {
 		writeSegment(sourceText, null);
 	}
 
-	private static void writeSegment(String sourceText, String restype)
+	private void writeSegment(String sourceText, String restype)
 			throws IOException, SAXException, ParserConfigurationException {
 		// replace escaped quotes with extended characters
 		sourceText = replaceText(sourceText, "&quot;", "\uE0FF");
@@ -207,7 +212,7 @@ public class MSOffice2Xliff {
 		writeSkel(replaceText(end, "\uE0FF", "&quot;"));
 	}
 
-	private static void writeAttributeSegment(String value)
+	private void writeAttributeSegment(String value)
 			throws IOException, SAXException, ParserConfigurationException {
 		writeSegment(XMLUtils.cleanText(value), ATTRIBUTE_RESTYPE);
 	}
@@ -271,11 +276,11 @@ public class MSOffice2Xliff {
 		return string.matches("[$\u20AC\u00A3]?[\\s]?[\\-]?(\\d+[\\.,]?(\\d+)?)+[\\s]?[%\u20AC]?");
 	}
 
-	private static void writeOut(String string) throws IOException {
+	private void writeOut(String string) throws IOException {
 		out.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void recurse(Segmenter segmenter, Element e)
+	private void recurse(Segmenter segmenter, Element e)
 			throws IOException, SAXException, ParserConfigurationException {
 		writeSkel("<" + e.getName());
 		List<Attribute> atts = e.getAttributes();
@@ -315,7 +320,7 @@ public class MSOffice2Xliff {
 		writeSkel("</" + e.getName() + ">");
 	}
 
-	private static void recurseVisioElement(Segmenter segmenter, Element e)
+	private void recurseVisioElement(Segmenter segmenter, Element e)
 			throws IOException, SAXException, ParserConfigurationException {
 		if (!text.isEmpty()) {
 			if (segByElement) {
@@ -366,7 +371,7 @@ public class MSOffice2Xliff {
 		writeSkel("</" + e.getName() + ">");
 	}
 
-	private static void recurseVisioChild(Element e) {
+	private void recurseVisioChild(Element e) {
 		text = text + "<ph>&lt;" + e.getName();
 		List<Attribute> atts = e.getAttributes();
 		for (Attribute a : atts) {
@@ -389,11 +394,11 @@ public class MSOffice2Xliff {
 		text = text + "<ph>&lt;/" + e.getName() + "&gt;</ph>";
 	}
 
-	private static void writeSkel(String string) throws IOException {
+	private void writeSkel(String string) throws IOException {
 		skel.write(string.getBytes(StandardCharsets.UTF_8));
 	}
 
-	private static void recursePara(Segmenter segmenter, Element e)
+	private void recursePara(Segmenter segmenter, Element e)
 			throws IOException, SAXException, ParserConfigurationException {
 		if ("si".equals(e.getName())) {
 			cleanPhonetics(e);
@@ -594,7 +599,7 @@ public class MSOffice2Xliff {
 				&& "w:br".equals(e.getChildren().get(0).getName());
 	}
 
-	private static void recursePhrase(Segmenter segmenter, Element e)
+	private void recursePhrase(Segmenter segmenter, Element e)
 			throws IOException, SAXException, ParserConfigurationException {
 		if ("mc:AlternateContent".equals(e.getName()) && !hasTextElement(e)) {
 			text = text + "<ph>" + getImageText(e) + "</ph>";
@@ -706,12 +711,6 @@ public class MSOffice2Xliff {
 		if (original.indexOf(">>") != -1) {
 			original = original.replace(">>", "\uE101");
 			fakeTags = true;
-		}
-		if (pattern == null) {
-			pattern = Pattern.compile("&lt;[A-Za-z0-9]+([\\s][A-Za-z\\-\\.]+=[\"|\'][^<&>]*[\"|\'])*[\\s]*/?&gt;");
-		}
-		if (endPattern == null) {
-			endPattern = Pattern.compile("&lt;/[A-Za-z0-9]+&gt;");
 		}
 		Element src = new Element("src");
 		src.setText(XMLUtils.cleanText(original));

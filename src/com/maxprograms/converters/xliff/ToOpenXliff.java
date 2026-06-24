@@ -68,7 +68,8 @@ public class ToOpenXliff {
                 result.add(Messages.getString("ToOpenXliff.0"));
                 return result;
             }
-            Xliff1xProcessor.resetFileIndex();
+            Xliff1xProcessor xliff1xProcessor = new Xliff1xProcessor();
+            xliff1xProcessor.resetFileIndex();
             for (Element originalFile : files) {
                 Element file = new Element("file");
                 file.setAttribute("datatype", "x-xliff");
@@ -108,7 +109,7 @@ public class ToOpenXliff {
                 List<Element> units = new Vector<>();
 
                 if (root.getAttributeValue("version").startsWith("1")) {
-                    Xliff1xProcessor.processXliff1x(originalFile, units);
+                    xliff1xProcessor.processXliff1x(originalFile, units);
                 }
                 if (root.getAttributeValue("version").startsWith("2")) {
                     Xliff2xProcessor.processXliff2x(originalFile, units);
