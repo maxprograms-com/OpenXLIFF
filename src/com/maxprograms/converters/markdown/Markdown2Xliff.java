@@ -67,9 +67,6 @@ public class Markdown2Xliff {
     private int segId;
     private Segmenter segmenter;
     private StringBuilder paragraphBuffer;
-    private StringBuilder codeFenceBuffer;
-    private StringBuilder indentedCodeBuffer;
-    private StringBuilder mathBlockBuffer;
     private Map<String, String> emojiMap;
 
     private Markdown2Xliff() {
@@ -96,9 +93,9 @@ public class Markdown2Xliff {
         List<String> result = new ArrayList<>();
         segId = 0;
         paragraphBuffer = new StringBuilder();
-        codeFenceBuffer = new StringBuilder();
-        indentedCodeBuffer = new StringBuilder();
-        mathBlockBuffer = new StringBuilder();
+        StringBuilder codeFenceBuffer = new StringBuilder();
+        StringBuilder indentedCodeBuffer = new StringBuilder();
+        StringBuilder mathBlockBuffer = new StringBuilder();
 
         String inputFile = params.get("source");
         String xliffFile = params.get("xliff");
@@ -266,7 +263,7 @@ public class Markdown2Xliff {
 
                     if (inCodeFence) {
                         if (isClosingFence(line, codeFenceDelimiter)) {
-                            if (codeFenceBuffer.length() > 0) {
+                            if (!codeFenceBuffer.isEmpty()) {
                                 addCodeBlockToSkeleton(codeFenceBuffer.toString());
                                 writeSkeleton("\n");
                                 codeFenceBuffer.setLength(0);
@@ -275,7 +272,7 @@ public class Markdown2Xliff {
                             inCodeFence = false;
                             codeFenceDelimiter = null;
                         } else {
-                            if (codeFenceBuffer.length() > 0) {
+                            if (!codeFenceBuffer.isEmpty()) {
                                 codeFenceBuffer.append("\n");
                             }
                             codeFenceBuffer.append(line);
@@ -300,7 +297,7 @@ public class Markdown2Xliff {
                             mathBlockBuffer.setLength(0);
                             inMathBlock = false;
                         } else {
-                            if (mathBlockBuffer.length() > 0) {
+                            if (!mathBlockBuffer.isEmpty()) {
                                 mathBlockBuffer.append("\n");
                             }
                             mathBlockBuffer.append(line);
@@ -373,14 +370,14 @@ public class Markdown2Xliff {
                     }
 
                     // Reference definition line: only at block level (not mid-paragraph)
-                    if (paragraphBuffer.length() == 0 && REF_DEF.matcher(line).matches()) {
+                    if (paragraphBuffer.isEmpty() && REF_DEF.matcher(line).matches()) {
                         flushParagraph();
                         writeSkeleton(line + "\n");
                         continue;
                     }
 
                     // Footnote definition: [^label]: text (GFM / Pandoc)
-                    if (paragraphBuffer.length() == 0) {
+                    if (paragraphBuffer.isEmpty()) {
                         Matcher fnm = FOOTNOTE_DEF.matcher(line);
                         if (fnm.matches()) {
                             String fnLabel = fnm.group(1);
@@ -420,7 +417,7 @@ public class Markdown2Xliff {
                         inMathBlock = true;
                         continue;
                     }
-                    if (paragraphBuffer.length() == 0 && mathLine.startsWith("$$")
+                    if (paragraphBuffer.isEmpty() && mathLine.startsWith("$$")
                             && mathLine.endsWith("$$") && mathLine.length() > 4) {
                         String formula = mathLine.substring(2, mathLine.length() - 2);
                         writeSkeleton("$$");
@@ -432,8 +429,8 @@ public class Markdown2Xliff {
                     // Definition list: : marker following a term (or a subsequent : for the same
                     // term)
                     Matcher dm = DEFINITION_MARKER.matcher(line);
-                    if (dm.matches() && (paragraphBuffer.length() > 0 || inDefinitionList)) {
-                        if (paragraphBuffer.length() > 0) {
+                    if (dm.matches() && (!paragraphBuffer.isEmpty() || inDefinitionList)) {
+                        if (!paragraphBuffer.isEmpty()) {
                             String term = paragraphBuffer.toString().trim();
                             paragraphBuffer.setLength(0);
                             addSegmentToSkeleton(term);
@@ -474,7 +471,7 @@ public class Markdown2Xliff {
                     }
 
                     // Setext heading underline: line of = (h1) or - (h2) following accumulated text
-                    if (paragraphBuffer.length() > 0 && isSetextHeadingUnderline(line)) {
+                    if (!paragraphBuffer.isEmpty() && isSetextHeadingUnderline(line)) {
                         String headingText = paragraphBuffer.toString().trim();
                         paragraphBuffer.setLength(0);
                         addSegmentToSkeleton(headingText);
@@ -548,14 +545,14 @@ public class Markdown2Xliff {
 
                     // Block-level HTML: a line starting with an HTML tag while no paragraph
                     // is being accumulated. The block runs until the next blank line.
-                    if (paragraphBuffer.length() == 0 && isHtmlBlockStart(line)) {
+                    if (paragraphBuffer.isEmpty() && isHtmlBlockStart(line)) {
                         inHtmlBlock = true;
                         writeSkeleton(line + "\n");
                         continue;
                     }
 
                     // List item continuation: indented paragraph within the current list item
-                    if (paragraphBuffer.length() == 0 && lastListIndent > 0) {
+                    if (paragraphBuffer.isEmpty() && lastListIndent > 0) {
                         int spaces = 0;
                         while (spaces < line.length() && line.charAt(spaces) == ' ') {
                             spaces++;
@@ -571,7 +568,7 @@ public class Markdown2Xliff {
                     }
 
                     // Indented code block start: 4 spaces or tab, only at block level
-                    if (paragraphBuffer.length() == 0 && isIndentedCodeLine(line)) {
+                    if (paragraphBuffer.isEmpty() && isIndentedCodeLine(line)) {
                         inIndentedCodeBlock = true;
                         indentedCodeBuffer.setLength(0);
                         indentedCodeBuffer.append(line);
@@ -579,17 +576,17 @@ public class Markdown2Xliff {
                     }
 
                     // Paragraph: accumulate until a blank line or block element
-                    if (paragraphBuffer.length() > 0) {
+                    if (!paragraphBuffer.isEmpty()) {
                         paragraphBuffer.append("\n");
                     }
                     paragraphBuffer.append(line);
                 }
 
-                if (inCodeFence && codeFenceBuffer.length() > 0) {
+                if (inCodeFence && !codeFenceBuffer.isEmpty()) {
                     addCodeBlockToSkeleton(codeFenceBuffer.toString());
                     writeSkeleton("\n");
                 }
-                if (inMathBlock && mathBlockBuffer.length() > 0) {
+                if (inMathBlock && !mathBlockBuffer.isEmpty()) {
                     addCodeBlockToSkeleton(mathBlockBuffer.toString());
                     writeSkeleton("\n");
                 }
@@ -616,7 +613,7 @@ public class Markdown2Xliff {
     }
 
     private void flushParagraph() throws IOException {
-        if (paragraphBuffer.length() == 0) {
+        if (paragraphBuffer.isEmpty()) {
             return;
         }
         String text = paragraphBuffer.toString();

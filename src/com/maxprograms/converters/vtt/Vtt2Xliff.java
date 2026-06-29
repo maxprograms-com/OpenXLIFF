@@ -100,7 +100,7 @@ public class Vtt2Xliff {
                                 writeSkeleton(pendingLine + '\n');
                                 pendingLine = null;
                             }
-                            if (sb.length() > 0) {
+                            if (!sb.isEmpty()) {
                                 writeSegment(sb.toString());
                                 sb = new StringBuilder();
                                 segTime = null;
@@ -127,7 +127,7 @@ public class Vtt2Xliff {
                     if (pendingLine != null) {
                         writeSkeleton(pendingLine + '\n');
                     }
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         writeSkeleton("\n");
                         writeSegment(sb.toString());
                     }
