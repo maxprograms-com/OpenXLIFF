@@ -688,7 +688,9 @@ public class Markdown2Xliff {
                 writeSkeleton(" | ");
             }
             String cellText = cells.get(i).trim();
-            if (!cellText.isEmpty()) {
+            if (cellText.isEmpty()) {
+                writeSkeleton(cells.get(i));
+            } else {
                 addSegmentToSkeleton(cellText);
             }
         }
