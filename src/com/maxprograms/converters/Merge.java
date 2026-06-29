@@ -39,6 +39,7 @@ import com.maxprograms.converters.idml.Xliff2Idml;
 import com.maxprograms.converters.javaproperties.Xliff2Properties;
 import com.maxprograms.converters.javascript.Xliff2jscript;
 import com.maxprograms.converters.json.Xliff2json;
+import com.maxprograms.converters.markdown.Xliff2Markdown;
 import com.maxprograms.converters.mif.Xliff2Mif;
 import com.maxprograms.converters.office.Xliff2Office;
 import com.maxprograms.converters.php.Xliff2Php;
@@ -407,6 +408,8 @@ public class Merge {
 			} else if (dataType.equals(FileFormats.JAVA) || dataType.equals("javapropertyresourcebundle")
 					|| dataType.equals("javalistresourcebundle")) {
 				result = Xliff2Properties.run(params);
+			} else if (dataType.equals(FileFormats.MARKDOWN) || dataType.equals("x-markdown")) {
+				result = Xliff2Markdown.run(params);
 			} else if (dataType.equals(FileFormats.MIF) || dataType.equals("mif")) {
 				result = Xliff2Mif.run(params);
 			} else if (dataType.equals(FileFormats.OFF) || dataType.equals("x-office")) {

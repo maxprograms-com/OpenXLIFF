@@ -44,6 +44,7 @@ import com.maxprograms.converters.idml.Story2Xliff;
 import com.maxprograms.converters.javaproperties.Properties2Xliff;
 import com.maxprograms.converters.javascript.Jscript2xliff;
 import com.maxprograms.converters.json.Json2Xliff;
+import com.maxprograms.converters.markdown.Markdown2Xliff;
 import com.maxprograms.converters.mif.Mif2Xliff;
 import com.maxprograms.converters.office.Office2Xliff;
 import com.maxprograms.converters.php.Php2Xliff;
@@ -450,6 +451,8 @@ public class Convert {
 				result = Json2Xliff.run(params);
 			} else if (format.equals(FileFormats.JAVA)) {
 				result = Properties2Xliff.run(params);
+			} else if (format.equals(FileFormats.MARKDOWN)) {
+				result = Markdown2Xliff.run(params);
 			} else if (format.equals(FileFormats.MIF)) {
 				result = Mif2Xliff.run(params);
 			} else if (format.equals(FileFormats.OO) || format.equals(FileFormats.OFF)) {

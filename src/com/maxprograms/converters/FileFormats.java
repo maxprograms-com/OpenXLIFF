@@ -70,11 +70,12 @@ public class FileFormats {
 	public static final String TXML = "TXML Document";
 	public static final String WPML = "WPML XLIFF";
 	public static final String XLIFF = "XLIFF Document";
+	public static final String MARKDOWN = "Markdown";
 	public static final String XML = "XML Document";
 	public static final String XMLG = "XML (Generic)";
 
-	protected static final String[] formats = { INX, ICML, IDML, DITA, HTML, JS, JSON, JAVA, MIF, OFF, OO, TEXT, PHPA,
-			PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, WPML, XLIFF, XML, XMLG };
+	protected static final String[] formats = { INX, ICML, IDML, DITA, HTML, JS, JSON, JAVA, MARKDOWN, MIF, OFF, OO,
+			TEXT, PHPA, PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, WPML, XLIFF, XML, XMLG };
 
 	public static boolean isBilingual(String type) {
 		return List.of(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF).contains(type);
@@ -318,6 +319,11 @@ public class FileFormats {
 		if (fileName.toLowerCase().endsWith(".rc")) {
 			return RC;
 		}
+		String lowerName = fileName.toLowerCase();
+		if (lowerName.endsWith(".md") || lowerName.endsWith(".markdown") || lowerName.endsWith(".mdown")
+				|| lowerName.endsWith(".mkd")) {
+			return MARKDOWN;
+		}
 		return null;
 	}
 
@@ -353,6 +359,9 @@ public class FileFormats {
 		}
 		if (type.equals(JAVA)) {
 			return "JAVA";
+		}
+		if (type.equals(MARKDOWN)) {
+			return "MD";
 		}
 		if (type.equals(MIF)) {
 			return "MIF";
@@ -435,6 +444,8 @@ public class FileFormats {
 		} else if (dataType.equals("JAVA") || dataType.equals("javapropertyresourcebundle")
 				|| dataType.equals("javalistresourcebundle")) {
 			return JAVA;
+		} else if (dataType.equals("MD") || dataType.equals("x-markdown")) {
+			return MARKDOWN;
 		} else if (dataType.equals("MIF") || dataType.equals("mif")) {
 			return MIF;
 		} else if (dataType.equals("OFF") || dataType.equals("x-office")) {

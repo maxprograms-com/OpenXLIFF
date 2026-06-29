@@ -169,6 +169,16 @@ public class EncodingResolver {
 			} catch (IOException e) {
 				logger.log(Level.ERROR, Messages.getString("EncodingResolver.6"), e);
 			}
+		} else if (fileType.equals(FileFormats.MARKDOWN)) {
+			try {
+				Charset bom = getBOM(fileName);
+				if (bom != null) {
+					return bom;
+				}
+				return StandardCharsets.UTF_8;
+			} catch (IOException e) {
+				logger.log(Level.ERROR, e.getMessage(), e);
+			}
 		}
 		return null;
 	}
