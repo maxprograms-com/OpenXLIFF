@@ -61,6 +61,7 @@ OpenXLIFF Filters can generate XLIFF 1.2, 2.0, 2.1 and 2.2 from these formats:
   - Adobe InDesign Interchange (INX)
   - Adobe InDesign IDML CS4, CS5, CS6 & CC
   - HTML
+  - Markdown (CommonMark, GitHub Flavored Markdown, Pandoc and other dialects)
   - Microsoft Office (2007 and newer)
   - Microsoft Visio XML Drawings (2007 and newer)
   - MIF (Maker Interchange Format)
