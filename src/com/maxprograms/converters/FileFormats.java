@@ -65,6 +65,7 @@ public class FileFormats {
 	public static final String SDLPPX = "Trados Studio Package";
 	public static final String SDLXLIFF = "SDLXLIFF Document";
 	public static final String SRT = "SRT Subtitle";
+	public static final String VTT = "VTT Subtitle";
 	public static final String TS = "TS (Qt Linguist translation source)";
 	public static final String TXLF = "Wordfast/GlobalLink XLIFF";
 	public static final String TXML = "TXML Document";
@@ -75,7 +76,7 @@ public class FileFormats {
 	public static final String XMLG = "XML (Generic)";
 
 	protected static final String[] formats = { INX, ICML, IDML, DITA, HTML, JS, JSON, JAVA, MARKDOWN, MIF, OFF, OO,
-			TEXT, PHPA, PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, WPML, XLIFF, XML, XMLG };
+			TEXT, PHPA, PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, VTT, WPML, XLIFF, XML, XMLG };
 
 	public static boolean isBilingual(String type) {
 		return List.of(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF).contains(type);
@@ -303,6 +304,9 @@ public class FileFormats {
 				builder.build(file);
 				return XML;
 			}
+			if (string.startsWith("WEBVTT")) {
+				return VTT;
+			}
 			if (string.indexOf(" --> ") != -1 && string.indexOf(':') != -1) {
 				return SRT;
 			}
@@ -323,6 +327,9 @@ public class FileFormats {
 		if (lowerName.endsWith(".md") || lowerName.endsWith(".markdown") || lowerName.endsWith(".mdown")
 				|| lowerName.endsWith(".mkd")) {
 			return MARKDOWN;
+		}
+		if (lowerName.endsWith(".vtt")) {
+			return VTT;
 		}
 		return null;
 	}
@@ -402,6 +409,9 @@ public class FileFormats {
 		if (type.equals(SRT)) {
 			return "SRT";
 		}
+		if (type.equals(VTT)) {
+			return "VTT";
+		}
 		if (type.equals(TS)) {
 			return "TS";
 		}
@@ -472,6 +482,8 @@ public class FileFormats {
 			return SDLXLIFF;
 		} else if (dataType.equals("SRT") || dataType.equals("x-srt")) {
 			return SRT;
+		} else if (dataType.equals("VTT") || dataType.equals("x-vtt")) {
+			return VTT;
 		} else if (dataType.equals("TS") || dataType.equals("x-ts")) {
 			return TS;
 		} else if (dataType.equals("TXML") || dataType.equals("x-txml")) {

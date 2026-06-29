@@ -143,7 +143,7 @@ public class EncodingResolver {
 			} catch (IOException e) {
 				logger.log(Level.ERROR, Messages.getString("EncodingResolver.3"), e);
 			}
-		} else if (fileType.equals(FileFormats.SRT)) {
+		} else if (fileType.equals(FileFormats.SRT) || fileType.equals(FileFormats.VTT)) {
 			try {
 				Charset bom = getBOM(fileName);
 				if (bom != null) {

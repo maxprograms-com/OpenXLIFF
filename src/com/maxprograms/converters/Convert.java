@@ -56,6 +56,7 @@ import com.maxprograms.converters.resx.Resx2Xliff;
 import com.maxprograms.converters.sdlppx.Sdlppx2Xliff;
 import com.maxprograms.converters.sdlxliff.Sdl2Xliff;
 import com.maxprograms.converters.srt.Srt2Xliff;
+import com.maxprograms.converters.vtt.Vtt2Xliff;
 import com.maxprograms.converters.ts.Ts2Xliff;
 import com.maxprograms.converters.txlf.Txlf2Xliff;
 import com.maxprograms.converters.txml.Txml2Xliff;
@@ -476,6 +477,8 @@ public class Convert {
 				result = Sdl2Xliff.run(params);
 			} else if (format.equals(FileFormats.SRT)) {
 				result = Srt2Xliff.run(params);
+			} else if (format.equals(FileFormats.VTT)) {
+				result = Vtt2Xliff.run(params);
 			} else if (format.equals(FileFormats.TEXT)) {
 				result = Text2Xliff.run(params);
 			} else if (format.equals(FileFormats.TS)) {

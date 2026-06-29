@@ -73,6 +73,7 @@ OpenXLIFF Filters can generate XLIFF 1.2, 2.0, 2.1 and 2.2 from these formats:
   - SDLXLIFF (Trados Studio)
   - SRT Subtitles
   - Trados Studio Packages (*.sdlppx)
+  - VTT Subtitles (WebVTT)
   - TXML (GlobalLink/Wordfast PRO)
   - WPML XLIFF (WordPress Multilingual Plugin)
   - Wordfast/GlobalLink XLIFF (*.txlf)
@@ -181,6 +182,7 @@ Default XML catalog and SRX file are provided. You can also use custom versions 
    JS = JavaScript
    JSON = JSON
    JAVA = Java Properties
+   MD = Markdown
    MIF = MIF (Maker Interchange Format)
    OFF = Microsoft Office 2007 Document
    OO = OpenOffice Document
@@ -197,6 +199,7 @@ Default XML catalog and SRX file are provided. You can also use custom versions 
    TS = TS (Qt Linguist translation source)
    TXLF = Wordfast/GlobalLink XLIFF
    TXML = TXML Document
+   VTT = VTT Subtitle
    WPML = WPML XLIFF
    XLIFF = XLIFF Document
    XML = XML Document
