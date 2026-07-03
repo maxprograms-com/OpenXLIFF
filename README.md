@@ -66,7 +66,6 @@ OpenXLIFF Filters can generate XLIFF 1.2, 2.0, 2.1 and 2.2 from these formats:
   - Microsoft Visio XML Drawings (2007 and newer)
   - MIF (Maker Interchange Format)
   - OpenOffice / LibreOffice / StarOffice
-  - PHP Arrays
   - Plain Text
   - QTI (IMS Question and Test Interoperability)
   - QTI Packages
