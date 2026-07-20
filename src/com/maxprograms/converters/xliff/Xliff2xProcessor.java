@@ -101,7 +101,10 @@ public class Xliff2xProcessor {
                     List<Element> matches = matchesHolder.getChildren("mtc:match");
                     for (Element match : matches) {
                         String ref = match.getAttributeValue("ref");
-                        if (ref.equals("#" + segment.getAttributeValue("id"))) {
+                        String local = ref.startsWith("#") ? ref.substring(1) : ref;
+                        local = local.substring(local.lastIndexOf('/') + 1);
+                        String segmentId = segment.getAttributeValue("id");
+                        if (local.equals(segmentId)) {
                             Element altTrans = new Element("alt-trans");
                             String origin = match.getAttributeValue("origin");
                             if (!origin.isEmpty()) {
