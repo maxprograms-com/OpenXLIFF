@@ -31,6 +31,8 @@ import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import com.maxprograms.converters.ditamap.Xliff2DitaMap;
@@ -89,6 +91,9 @@ public class Merge {
 		String[] arguments = Utils.fixPath(args);
 		for (int i = 0; i < arguments.length; i++) {
 			String arg = arguments[i];
+			if (arg.equals("-lang") && (i + 1) < arguments.length) {
+				Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
+			}
 			if (arg.equals("-version")) {
 				MessageFormat mf = new MessageFormat(Messages.getString("Merge.01"));
 				logger.log(Level.INFO, mf.format(new String[] { Constants.VERSION, Constants.BUILD }));
@@ -116,11 +121,24 @@ public class Merge {
 			if (arg.equals("-getTarget")) {
 				getTarget = true;
 			}
-			if (arg.equals("-lang") && (i + 1) < arguments.length) {
-				Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
-			}
 			if (arg.equals("-maxThreads") && (i + 1) < arguments.length) {
 				maxThreads = arguments[i + 1];
+			}
+			if (arg.equals("-json") && (i + 1) < arguments.length) {
+				try {
+					JSONObject json = Utils.readJSON(arguments[i + 1]);
+					xliff = json.optString("xliff", "");
+					target = json.optString("target", "");
+					catalog = json.optString("catalog", "");
+					maxThreads = json.optString("maxThreads", "");
+					unapproved = json.optBoolean("unapproved", false);
+					exportTMX = json.optBoolean("export", false);
+					getTarget = json.optBoolean("getTarget", false);
+				} catch (IOException | JSONException e) {
+					MessageFormat mf = new MessageFormat(Messages.getString("Merge.07"));
+					logger.log(Level.ERROR, mf.format(new String[] { e.getMessage() }));
+					return;
+				}
 			}
 		}
 		if (arguments.length < 2) {
