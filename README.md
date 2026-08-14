@@ -310,6 +310,56 @@ Where:
    -catalog:   (optional) XML catalog to use for processing
 ```
 
+## Re-segment XLIFF 2.x
+
+You can re-segment an existing XLIFF 2.x document in place using class `com.maxprograms.xliff2.Resegmenter` from your Java code or using the provided scripts.
+
+> Resegmenter only supports XLIFF 2.x documents. XLIFF 1.2 files are not accepted.
+
+If you use binaries from the command line, running `.\resegment.cmd` or `./resegment.sh` without parameters displays help for re-segmenting an XLIFF file.
+
+```text
+Usage:
+
+resegment.sh [-help] [-version] -xliff xliffFile -srx srxFile -srcLang sourceLang [-catalog catalogFile] [-maxThreads maxThreads] [-lang locale]
+
+Where:
+
+   -help:      (optional) display this help information and exit
+   -version:   (optional) show version information and exit
+   -xliff:     XLIFF file to resegment in place
+   -srx:       SRX rules file
+   -srcLang:   source language code
+   -catalog:   (optional) XML catalog to use for processing
+   -maxThreads:(optional) maximum number of threads to use
+```
+
+The input file is modified in place.
+
+## Transform XML with XSLT
+
+You can apply an XSL transformation to an XML file using class `com.maxprograms.xslt.XsltRunner` from your Java code or using the provided scripts.
+
+If you use binaries from the command line, running `.\xslt.cmd` or `./xslt.sh` without parameters displays help for XSLT processing.
+
+```text
+Usage:
+
+XsltRunner [-help] [-version] -xml xmlFile -xsl xslFile -output outputFile
+
+Where:
+
+   -help:      (optional) display this help information and exit
+   -version:   (optional) show version information and exit
+   -xml:       source XML file to transform
+   -xsl:       XSL stylesheet to apply
+   -output:    output file to write
+```
+
+The output is written to the specified file path.
+
+XsltRunner uses the XSLT processor provided by the JDK and supports XSLT 1.0. XSLT 2.0 and XSLT 3.0 features are not supported.
+
 ### XLIFF Validation Service
 
 You can validate your XLIFF files online at [https://dev.maxprograms.com/Validation/](https://dev.maxprograms.com/Validation/)

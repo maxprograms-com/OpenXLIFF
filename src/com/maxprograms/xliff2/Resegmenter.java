@@ -16,9 +16,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,12 +28,15 @@ import java.util.concurrent.Future;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.json.JSONObject;
 import org.xml.sax.SAXException;
 
 import com.maxprograms.converters.Constants;
+import com.maxprograms.converters.Utils;
 import com.maxprograms.segmenter.Segmenter;
 import com.maxprograms.segmenter.SegmenterPool;
 import com.maxprograms.xml.Catalog;
+import com.maxprograms.xml.CatalogBuilder;
 import com.maxprograms.xml.Document;
 import com.maxprograms.xml.Element;
 import com.maxprograms.xml.Indenter;
@@ -42,6 +47,8 @@ import com.maxprograms.xml.XMLOutputter;
 
 public class Resegmenter {
 
+    private static Logger logger = System.getLogger(Resegmenter.class.getName());
+
     private static final class Context {
         Segmenter segmenter;
         boolean canResegment;
@@ -51,6 +58,178 @@ public class Resegmenter {
     private Resegmenter() {
         // do not instantiate this class
         // use run method instead
+    }
+
+    public static void main(String[] args) {
+
+        String jsonFile = "";
+        String xliffFile = "";
+        String srxFile = "";
+        String srcLang = "";
+        String catalogFile = "";
+        String maxThreadsParam = "";
+
+        String[] arguments = Utils.fixPath(args);
+        if (arguments.length == 0) {
+            help();
+            return;
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            String arg = arguments[i];
+            if (arg.equals("-lang") && (i + 1) < arguments.length) {
+                Locale.setDefault(Locale.forLanguageTag(arguments[i + 1]));
+            }
+            if (arg.equals("-version")) {
+                MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.3"));
+                logger.log(Level.INFO, mf.format(new String[] { Constants.VERSION, Constants.BUILD }));
+                return;
+            }
+            if (arg.equals("-help")) {
+                help();
+                return;
+            }
+            if (arg.equals(("-xliff")) && (i + 1) < arguments.length) {
+                xliffFile = arguments[i + 1];
+            }
+            if (arg.equals(("-srx")) && (i + 1) < arguments.length) {
+                srxFile = arguments[i + 1];
+            }
+            if (arg.equals(("-srcLang")) && (i + 1) < arguments.length) {
+                srcLang = arguments[i + 1];
+            }
+            if (arg.equals(("-catalog")) && (i + 1) < arguments.length) {
+                catalogFile = arguments[i + 1];
+            }
+            if (arg.equals(("-maxThreads")) && (i + 1) < arguments.length) {
+                maxThreadsParam = arguments[i + 1];
+            }
+            if (arg.equals("-json") && (i + 1) < arguments.length) {
+                jsonFile = arguments[i + 1];
+                run(jsonFile);
+                return;
+            }
+        }
+        if (xliffFile.isEmpty()) {
+            MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+            logger.log(Level.ERROR, mf.format(new String[] { "-xliff" }));
+            return;
+        }
+        if (srxFile.isEmpty()) {
+            MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+            logger.log(Level.ERROR, mf.format(new String[] { "-srx" }));
+            return;
+        }
+        if (srcLang.isEmpty()) {
+            MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+            logger.log(Level.ERROR, mf.format(new String[] { "-srcLang" }));
+            return;
+        }
+        if (catalogFile.isEmpty()) {
+            String home = System.getenv("OpenXLIFF_HOME");
+            if (home == null) {
+                home = System.getProperty("user.dir");
+            }
+            File catalogFolder = new File(new File(home), "catalog");
+            if (!catalogFolder.exists()) {
+                logger.log(Level.ERROR, Messages.getString("Resegmenter.6"));
+                return;
+            }
+            catalogFile = new File(catalogFolder, "catalog.xml").getAbsolutePath();
+        }
+
+        File catalog = new File(catalogFile);
+        if (!catalog.exists()) {
+            logger.log(Level.ERROR, Messages.getString("Resegmenter.7"));
+            return;
+        }
+        if (!catalog.isAbsolute()) {
+            catalogFile = catalog.getAbsoluteFile().getAbsolutePath();
+        }
+        int maxThreads;
+        if (!maxThreadsParam.isEmpty()) {
+            try {
+                maxThreads = Integer.parseInt(maxThreadsParam);
+                if (maxThreads < 1) {
+                    maxThreads = 1;
+                }
+            } catch (NumberFormatException _) {
+                // Use default if invalid
+                maxThreads = Runtime.getRuntime().availableProcessors();
+            }
+        } else {
+            maxThreads = Runtime.getRuntime().availableProcessors();
+        }
+        try {
+            Catalog instance = CatalogBuilder.getCatalog(catalogFile);
+            run(xliffFile, srxFile, srcLang, instance, maxThreads);
+        } catch (IOException | SAXException | ParserConfigurationException | URISyntaxException e) {
+            logger.log(Level.ERROR, e);
+        }
+    }
+
+    private static void run(String jsonFile) {
+        try {
+            JSONObject json = Utils.readJSON(jsonFile);
+            String xliffFile = json.optString("xliff", "");
+            String srxFile = json.optString("srx", "");
+            String srcLang = json.optString("srclang", "");
+            String catalogFile = json.optString("catalog", "");
+            String maxThreadsParam = json.optString("maxThreads", "");
+            if (xliffFile.isEmpty()) {
+                MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+                logger.log(Level.ERROR, mf.format(new String[] { "-xliff" }));
+                return;
+            }
+            if (srxFile.isEmpty()) {
+                MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+                logger.log(Level.ERROR, mf.format(new String[] { "-srx" }));
+                return;
+            }
+            if (srcLang.isEmpty()) {
+                MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.5"));
+                logger.log(Level.ERROR, mf.format(new String[] { "-srcLang" }));
+                return;
+            }
+            if (catalogFile.isEmpty()) {
+                String home = System.getenv("OpenXLIFF_HOME");
+                if (home == null) {
+                    home = System.getProperty("user.dir");
+                }
+                File catalogFolder = new File(new File(home), "catalog");
+                if (!catalogFolder.exists()) {
+                    logger.log(Level.ERROR, Messages.getString("Resegmenter.6"));
+                    return;
+                }
+                catalogFile = new File(catalogFolder, "catalog.xml").getAbsolutePath();
+            }
+
+            File catalog = new File(catalogFile);
+            if (!catalog.exists()) {
+                logger.log(Level.ERROR, Messages.getString("Resegmenter.7"));
+                return;
+            }
+            if (!catalog.isAbsolute()) {
+                catalogFile = catalog.getAbsoluteFile().getAbsolutePath();
+            }
+            int maxThreads;
+            if (!maxThreadsParam.isEmpty()) {
+                try {
+                    maxThreads = Integer.parseInt(maxThreadsParam);
+                    if (maxThreads < 1) {
+                        maxThreads = 1;
+                    }
+                } catch (NumberFormatException _) {
+                    // Use default if invalid
+                    maxThreads = Runtime.getRuntime().availableProcessors();
+                }
+            } else {
+                maxThreads = Runtime.getRuntime().availableProcessors();
+            }
+            Catalog instance = CatalogBuilder.getCatalog(catalogFile);
+            run(xliffFile, srxFile, srcLang, instance, maxThreads);
+        } catch (IOException | SAXException | ParserConfigurationException | URISyntaxException e) {
+            logger.log(Level.ERROR, e);
+        }
     }
 
     public static List<String> run(String xliff, String srx, String srcLang, Catalog catalog, int maxThreads) {
@@ -242,5 +421,12 @@ public class Resegmenter {
             }
         }
         return false;
+    }
+
+    private static void help() {
+        MessageFormat mf = new MessageFormat(Messages.getString("Resegmenter.help"));
+        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
+        String help = mf.format(new String[] { isWindows ? "resegment.cmd" : "resegment.sh" });
+        System.out.println(help);
     }
 }

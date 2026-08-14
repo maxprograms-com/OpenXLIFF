@@ -35,6 +35,7 @@ module openxliff {
 	exports com.maxprograms.segmenter;
 	exports com.maxprograms.stats;
 	exports com.maxprograms.xliff2;
+	exports com.maxprograms.xslt;
 	exports com.maxprograms.validation;
 
 	requires jsoup;
