@@ -71,15 +71,17 @@ public class FileFormats {
 	public static final String TXML = "TXML Document";
 	public static final String WPML = "WPML XLIFF";
 	public static final String XLIFF = "XLIFF Document";
+	public static final String XLIFF2 = "XLIFF 2.x Document";
 	public static final String MARKDOWN = "Markdown";
 	public static final String XML = "XML Document";
 	public static final String XMLG = "XML (Generic)";
 
 	protected static final String[] formats = { INX, ICML, IDML, DITA, HTML, JS, JSON, JAVA, MARKDOWN, MIF, OFF, OO,
-			TEXT, PHPA, PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, VTT, WPML, XLIFF, XML, XMLG };
+			TEXT, PHPA, PO, QTI, QTIP, RC, RESX, SDLPPX, SDLXLIFF, SRT, TS, TXML, TXLF, VTT, WPML, XLIFF, XLIFF2, XML,
+			XMLG };
 
 	public static boolean isBilingual(String type) {
-		return List.of(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF).contains(type);
+		return List.of(PO, SDLPPX, SDLXLIFF, TS, TXML, TXLF, WPML, XLIFF, XLIFF2).contains(type);
 	}
 
 	public static void main(String[] args) {
@@ -177,7 +179,7 @@ public class FileFormats {
 				return WPML;
 			}
 			if (string.indexOf("<xliff ") != -1 && parseXliff(fileName)) {
-				return XLIFF;
+				return isXliff2(fileName) ? XLIFF2 : XLIFF;
 			}
 			if (string.startsWith("<?php")) {
 				return PHPA;
@@ -427,6 +429,9 @@ public class FileFormats {
 		if (type.equals(XLIFF)) {
 			return "XLIFF";
 		}
+		if (type.equals(XLIFF2)) {
+			return "XLIFF2";
+		}
 		if (type.equals(XML)) {
 			return "XML";
 		}
@@ -494,6 +499,8 @@ public class FileFormats {
 			return WPML;
 		} else if (dataType.equals("XLIFF") || dataType.equals("x-xliff")) {
 			return XLIFF;
+		} else if (dataType.equals("XLIFF2") || dataType.equals("x-xliff2")) {
+			return XLIFF2;
 		} else if (dataType.equals("XML") || dataType.equals("xml")) {
 			return XML;
 		} else if (dataType.equals("XMLG")) {
@@ -507,6 +514,16 @@ public class FileFormats {
 			SAXBuilder builder = new SAXBuilder();
 			Document doc = builder.build(file);
 			return doc.getRootElement().getName().equals("xliff");
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			return false;
+		}
+	}
+
+	private static boolean isXliff2(String file) {
+		try {
+			SAXBuilder builder = new SAXBuilder();
+			Document doc = builder.build(file);
+			return doc.getRootElement().getAttributeValue("version", "").startsWith("2.");
 		} catch (SAXException | IOException | ParserConfigurationException e) {
 			return false;
 		}

@@ -43,6 +43,24 @@ public class Xliff2Utils {
         return false;
     }
 
+    public static boolean isDirectXliff2(Element root) {
+        List<Element> files = root.getChildren("file");
+        if (!files.isEmpty()) {
+            Element metadata = files.get(0).getChild("mda:metadata");
+            if (metadata != null) {
+                for (Element group : metadata.getChildren("mda:metaGroup")) {
+                    if ("format".equals(group.getAttributeValue("category"))) {
+                        Element meta = group.getChild("mda:meta");
+                        if (meta != null && "datatype".equals(meta.getAttributeValue("type"))) {
+                            return "x-xliff2".equals(meta.getText());
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean isOpenXliffIntermediate(String file, String catalog) {
         try {
             SAXBuilder builder = new SAXBuilder();

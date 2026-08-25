@@ -123,13 +123,14 @@ public class EncodingResolver {
 				|| fileType.equals(FileFormats.RESX) || fileType.equals(FileFormats.INX)
 				|| fileType.equals(FileFormats.TS) || fileType.equals(FileFormats.DITA)
 				|| fileType.equals(FileFormats.QTI) || fileType.equals(FileFormats.SDLXLIFF)
-				|| fileType.equals(FileFormats.WPML) || fileType.equals(FileFormats.XLIFF)) {
+				|| fileType.equals(FileFormats.WPML) || fileType.equals(FileFormats.XLIFF)
+				|| fileType.equals(FileFormats.XLIFF2)) {
 			try {
 				return getXMLEncoding(fileName);
 			} catch (IOException e) {
 				logger.log(Level.ERROR, Messages.getString("EncodingResolver.1"), e);
 			}
-		} else if (fileType.equals(FileFormats.QTIP) ||fileType.equals(FileFormats.SDLPPX) ) {
+		} else if (fileType.equals(FileFormats.QTIP) || fileType.equals(FileFormats.SDLPPX)) {
 			return StandardCharsets.UTF_8;
 		} else if (fileType.equals(FileFormats.RC)) {
 			try {

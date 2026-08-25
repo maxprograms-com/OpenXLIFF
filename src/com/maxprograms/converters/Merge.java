@@ -53,12 +53,13 @@ import com.maxprograms.converters.resx.Xliff2Resx;
 import com.maxprograms.converters.sdlppx.Xliff2Sdlrpx;
 import com.maxprograms.converters.sdlxliff.Xliff2Sdl;
 import com.maxprograms.converters.srt.Xliff2Srt;
-import com.maxprograms.converters.vtt.Xliff2Vtt;
 import com.maxprograms.converters.ts.Xliff2Ts;
 import com.maxprograms.converters.txlf.Xliff2Txlf;
 import com.maxprograms.converters.txml.Xliff2Txml;
+import com.maxprograms.converters.vtt.Xliff2Vtt;
 import com.maxprograms.converters.wpml.Xliff2Wpml;
 import com.maxprograms.converters.xliff.FromOpenXliff;
+import com.maxprograms.converters.xliff2.FromOpenXliff2;
 import com.maxprograms.converters.xml.Xliff2Xml;
 import com.maxprograms.xliff2.FromXliff2;
 import com.maxprograms.xliff2.Xliff2Utils;
@@ -217,16 +218,32 @@ public class Merge {
 		}
 	}
 
-	public static List<String> merge(String xliff, String target, String catalog, boolean acceptUnaproved, String maxThreads) {
+	public static List<String> merge(String xliff, String target, String catalog, boolean acceptUnaproved,
+			String maxThreads) {
 		return new Merge().doMerge(xliff, target, catalog, acceptUnaproved, maxThreads);
 	}
 
-	private List<String> doMerge(String xliff, String target, String catalog, boolean acceptUnaproved, String maxThreads) {
+	private List<String> doMerge(String xliff, String target, String catalog, boolean acceptUnaproved,
+			String maxThreads) {
 		List<String> result = new ArrayList<>();
 		try {
 			loadXliff(xliff, catalog);
 			boolean unapproved = acceptUnaproved;
 			if (root.getAttributeValue("version").startsWith("2.")) {
+				if (Xliff2Utils.isDirectXliff2(root)) {
+					Element file = root.getChild("file");
+					String skeleton = file.getChild("skeleton").getAttributeValue("href");
+					Map<String, String> params = new HashMap<>();
+					params.put("xliff", xliff);
+					params.put("skeleton", skeleton);
+					params.put("backfile", target);
+					params.put("catalog", catalog);
+					List<String> res = FromOpenXliff2.run(params);
+					if (!Constants.SUCCESS.equals(res.get(0))) {
+						logger.log(Level.ERROR, res.get(1));
+					}
+					return res;
+				}
 				if (Xliff2Utils.isXliffUpgrade(root)) {
 					FromXliff2.run(xliff, target, catalog);
 					result.add(Constants.SUCCESS);

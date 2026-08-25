@@ -56,12 +56,13 @@ import com.maxprograms.converters.resx.Resx2Xliff;
 import com.maxprograms.converters.sdlppx.Sdlppx2Xliff;
 import com.maxprograms.converters.sdlxliff.Sdl2Xliff;
 import com.maxprograms.converters.srt.Srt2Xliff;
-import com.maxprograms.converters.vtt.Vtt2Xliff;
 import com.maxprograms.converters.ts.Ts2Xliff;
 import com.maxprograms.converters.txlf.Txlf2Xliff;
 import com.maxprograms.converters.txml.Txml2Xliff;
+import com.maxprograms.converters.vtt.Vtt2Xliff;
 import com.maxprograms.converters.wpml.Wpml2Xliff;
 import com.maxprograms.converters.xliff.ToOpenXliff;
+import com.maxprograms.converters.xliff2.ToOpenXliff2;
 import com.maxprograms.converters.xml.Xml2Xliff;
 import com.maxprograms.xliff2.Resegmenter;
 import com.maxprograms.xliff2.ToXliff2;
@@ -309,7 +310,9 @@ public class Convert {
 		}
 		if (!paragraph && (xliff20 || xliff21 || xliff22)) {
 			paragraph = true;
-			resegment = true;
+			if (!type.equals(FileFormats.XLIFF2)) {
+				resegment = true;
+			}
 		}
 		Map<String, String> params = new HashMap<>();
 		params.put("source", source);
@@ -504,6 +507,17 @@ public class Convert {
 					if ("yes".equals(params.get("xliff22")))
 						ver = "2.2";
 					result = ToXliff2.run(params.get("source"), params.get("xliff"), params.get("catalog"), ver, true);
+					params.remove("xliff20");
+					params.remove("xliff21");
+					params.remove("xliff22");
+				} else {
+					result = ToOpenXliff.run(params);
+				}
+			} else if (format.equals(FileFormats.XLIFF2)) {
+				boolean xliff2x = "yes".equals(params.get("xliff20")) || "yes".equals(params.get("xliff21"))
+						|| "yes".equals(params.get("xliff22"));
+				if (xliff2x) {
+					result = ToOpenXliff2.run(params);
 					params.remove("xliff20");
 					params.remove("xliff21");
 					params.remove("xliff22");
