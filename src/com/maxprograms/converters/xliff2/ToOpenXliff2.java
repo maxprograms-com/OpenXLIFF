@@ -19,7 +19,9 @@ import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -45,6 +47,7 @@ public class ToOpenXliff2 {
     int fileIndex = 0;
     int unitCounter = 1;
     int tagCounter = 1;
+    String targetVersion = "";
 
     private ToOpenXliff2() {
         usesMatches = false;
@@ -67,7 +70,7 @@ public class ToOpenXliff2 {
             String skeletonFile = params.get("skeleton");
             String catalog = params.get("catalog");
 
-            String version = "2.1";
+            String version = "";
             if ("yes".equals(params.get("xliff20"))) {
                 version = "2.0";
             }
@@ -77,6 +80,12 @@ public class ToOpenXliff2 {
             if ("yes".equals(params.get("xliff22"))) {
                 version = "2.2";
             }
+            if (version.isEmpty()) {
+                result.add(Constants.ERROR);
+                result.add(Messages.getString("ToOpenXliff2.4"));
+                return result;
+            }
+            targetVersion = version;
 
             SAXBuilder builder = new SAXBuilder();
             builder.setEntityResolver(CatalogBuilder.getCatalog(catalog));
@@ -117,6 +126,20 @@ public class ToOpenXliff2 {
             }
             if (usesGlossary) {
                 outputRoot.setAttribute("xmlns:gls", "urn:oasis:names:tc:xliff:glossary:2.0");
+            }
+
+            Element sourceRootNotes = sourceRoot.getChild("notes");
+            if (sourceRootNotes != null && "2.2".equals(version)) {
+                Element rootNotesCopy = new Element("notes");
+                rootNotesCopy.clone(sourceRootNotes);
+                outputRoot.addContent(rootNotesCopy);
+            }
+
+            Element sourceRootMetadata = sourceRoot.getChild("mda:metadata");
+            if (sourceRootMetadata != null && "2.2".equals(version)) {
+                Element rootMetadataCopy = new Element("mda:metadata");
+                rootMetadataCopy.clone(sourceRootMetadata);
+                outputRoot.addContent(rootMetadataCopy);
             }
 
             for (Element sourceFile : sourceFiles) {
@@ -198,13 +221,22 @@ public class ToOpenXliff2 {
         toolGroup.addContent(toolVersion);
         metadata.addContent(toolGroup);
 
+        Element sourceFileMetadata = sourceFile.getChild("mda:metadata");
+        if (sourceFileMetadata != null) {
+            for (Element metaGroup : sourceFileMetadata.getChildren("mda:metaGroup")) {
+                Element metaGroupCopy = new Element("mda:metaGroup");
+                metaGroupCopy.clone(metaGroup);
+                metadata.addContent(metaGroupCopy);
+            }
+        }
+
         outputFile.addContent(metadata);
 
         Element sourceNotes = sourceFile.getChild("notes");
         if (sourceNotes != null) {
-            Element copy = new Element("notes");
-            copy.clone(sourceNotes);
-            outputFile.addContent(copy);
+            Element notesCopy = new Element("notes");
+            notesCopy.clone(sourceNotes);
+            outputFile.addContent(notesCopy);
         }
 
         unitCounter = 1;
@@ -251,12 +283,16 @@ public class ToOpenXliff2 {
             this.usesGlossary = true;
         }
 
-        Element sourceNotes = sourceUnit.getChild("notes");
-        Element notesCopy = null;
-        if (sourceNotes != null) {
-            notesCopy = new Element("notes");
-            notesCopy.clone(sourceNotes);
+        Set<String> referencedNoteIds = collectReferencedNoteIds(sourceUnit);
+        Set<String> segmentIds = ConcurrentHashMap.newKeySet();
+        for (Element child : sourceUnit.getChildren("segment")) {
+            String id = child.getAttributeValue("id");
+            if (!id.isEmpty()) {
+                segmentIds.add(id);
+            }
         }
+        Element sourceNotes = sourceUnit.getChild("notes");
+        Element notesCopy = filterUsefulNotes(sourceNotes, referencedNoteIds, segmentIds);
 
         Element originalData = new Element("originalData");
         tagCounter = 1;
@@ -379,5 +415,49 @@ public class ToOpenXliff2 {
         Element ph = new Element("ph");
         ph.setAttribute("id", id);
         return ph;
+    }
+
+    private Set<String> collectReferencedNoteIds(Element element) {
+        Set<String> ids = ConcurrentHashMap.newKeySet();
+        if ("mrk".equals(element.getName()) && "comment".equals(element.getAttributeValue("type"))) {
+            String ref = element.getAttributeValue("ref");
+            if (ref.startsWith("#n") && ref.indexOf('=') != -1) {
+                ids.add(ref.substring(ref.indexOf('=') + 1));
+            }
+        }
+        for (Element child : element.getChildren()) {
+            ids.addAll(collectReferencedNoteIds(child));
+        }
+        return ids;
+    }
+
+    private Element filterUsefulNotes(Element sourceNotes, Set<String> referencedNoteIds, Set<String> segmentIds) {
+        if (sourceNotes == null) {
+            return null;
+        }
+        boolean refSupported = "2.2".equals(targetVersion);
+        List<Element> usefulNotes = new Vector<>();
+        for (Element note : sourceNotes.getChildren("note")) {
+            String id = note.getAttributeValue("id");
+            boolean hasId = !id.isEmpty() && referencedNoteIds.contains(id);
+            String ref = note.getAttributeValue("ref");
+            boolean hasRef = refSupported && ref.startsWith("#") && segmentIds.contains(ref.substring(1));
+            if (hasId || hasRef) {
+                usefulNotes.add(note);
+            }
+        }
+        if (usefulNotes.isEmpty()) {
+            return null;
+        }
+        Element notesCopy = new Element("notes");
+        for (Element note : usefulNotes) {
+            Element copy = new Element("note");
+            copy.clone(note);
+            if (!refSupported) {
+                copy.removeAttribute("ref");
+            }
+            notesCopy.addContent(copy);
+        }
+        return notesCopy;
     }
 }
