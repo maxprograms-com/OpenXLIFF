@@ -70,7 +70,9 @@ public class ToOpenXliff {
             }
             Xliff1xProcessor xliff1xProcessor = new Xliff1xProcessor();
             xliff1xProcessor.resetFileIndex();
+            int fileIndex = 0;
             for (Element originalFile : files) {
+                fileIndex++;
                 Element file = new Element("file");
                 file.setAttribute("datatype", "x-xliff");
                 file.setAttribute("source-language", sourceLanguage);
@@ -79,6 +81,7 @@ public class ToOpenXliff {
                 }
                 file.setAttribute("original", inputFile);
                 JSONObject json = new JSONObject();
+                json.put("fileId", "" + fileIndex);
                 List<Attribute> atts = originalFile.getAttributes();
                 for (Attribute att : atts) {
                     json.put(att.getName(), att.getValue());

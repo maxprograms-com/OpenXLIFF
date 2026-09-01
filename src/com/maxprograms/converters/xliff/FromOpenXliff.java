@@ -58,6 +58,7 @@ public class FromOpenXliff {
     private static Map<String, Element> fileMetadata;
     private static Map<String, Element> unitMetadata;
     private static int skeletonFileIndex;
+    private static int xliffFileIndex;
 
     private FromOpenXliff() {
         // do not instantiate this class
@@ -363,6 +364,7 @@ public class FromOpenXliff {
         builder.setEntityResolver(catalog);
         Document xliff = builder.build(xliffFile);
         segments = new Hashtable<>();
+        xliffFileIndex = 0;
         recurseXliff(xliff.getRootElement());
     }
 
@@ -371,6 +373,15 @@ public class FromOpenXliff {
             throw new IOException(Messages.getString("FromOpenXliff.2"));
         }
         if ("file".equals(e.getName())) {
+            xliffFileIndex++;
+            String version = "";
+            Element header = e.getChild("header");
+            if (header != null) {
+                Element tool = header.getChild("tool");
+                if (tool != null && tool.hasAttribute("tool-version")) {
+                    version = tool.getAttributeValue("tool-version");
+                }
+            }
             List<PI> pi = e.getPI("ts");
             if (!pi.isEmpty()) {
                 String json = pi.get(0).getData();
@@ -381,7 +392,11 @@ public class FromOpenXliff {
                         currentFile = obj.getString("id");
                     } else if (obj.has("fileId")) {
                         // original was XLIFF 1.x, new scheme (6.0+)
-                        currentFile = obj.getString("fileId");
+                        if (List.of("6.0.0", "6.1.0", "6.2.0", "6.2.1").contains(version)) {
+                            currentFile = String.valueOf(xliffFileIndex);
+                        } else {
+                            currentFile = obj.getString("fileId");
+                        }
                     } else if (obj.has("original")) {
                         // original was XLIFF 1.x, old scheme
                         currentFile = obj.getString("original");
@@ -399,16 +414,20 @@ public class FromOpenXliff {
                         currentFile = obj.getString("fileId");
                     } else if (obj.has("original")) {
                         // original was XLIFF 1.x, old scheme
-                        currentFile = obj.getString("original");
+                        if (List.of("6.0.0", "6.1.0", "6.2.0", "6.2.1").contains(version)) {
+                            currentFile = String.valueOf(xliffFileIndex);
+                        } else {
+                            currentFile = obj.getString("original");
+                        }
                     }
                 }
             }
             if (tgtLang.isEmpty()) {
                 tgtLang = e.getAttributeValue("target-language");
             }
-            List<PI> metadata = e.getPI("metadata");
-            if (!metadata.isEmpty()) {
-                fileMetadata.put(currentFile, toMetadata(metadata.get(0).getData()));
+            List<PI> metaPI = e.getPI("metadata");
+            if (!metaPI.isEmpty()) {
+                fileMetadata.put(currentFile, toMetadata(metaPI.get(0).getData()));
             }
         }
         if ("trans-unit".equals(e.getName())) {
