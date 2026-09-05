@@ -621,6 +621,18 @@ public class MSOffice2Xliff {
 			writeSkel(e.toString());
 			return;
 		}
+		if ("wps:wsp".equals(e.getName()) && !text.isEmpty()) {
+			// start each Word DrawingML shape on its own segment
+			if (segByElement) {
+				writeSegment(text);
+			} else {
+				String[] segs = segmenter.segment(text);
+				for (int h = 0; h < segs.length; h++) {
+					writeSegment(segs[h]);
+				}
+			}
+			text = "";
+		}
 		if (e.getName().equals("w:p")) {
 			cleanPara(e);
 		}
