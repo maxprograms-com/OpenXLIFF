@@ -162,10 +162,9 @@ public class Xliff2xProcessor {
                             ph1.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { head, "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(head);
+                            int i = consumeTag(head);
                             if (i != -1) {
                                 ph1.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { head, "" + i });
                             } else {
                                 ph1.setAttribute("id", "" + tag++);
                             }
@@ -181,10 +180,9 @@ public class Xliff2xProcessor {
                             ph2.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { head + "<tail/>", "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(head + "<tail/>");
+                            int i = consumeTag(head + "<tail/>");
                             if (i != -1) {
                                 ph2.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { head + "<tail/>", "" + i });
                             } else {
                                 ph2.setAttribute("id", "" + tag++);
                             }
@@ -199,10 +197,9 @@ public class Xliff2xProcessor {
                             ph.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { text, "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(e.toString());
+                            int i = consumeTag(e.toString());
                             if (i != -1) {
                                 ph.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { text, "" + i });
                             } else {
                                 ph.setAttribute("id", "" + tag++);
                             }
@@ -217,10 +214,9 @@ public class Xliff2xProcessor {
                             ph.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { text, "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(e.toString());
+                            int i = consumeTag(e.toString());
                             if (i != -1) {
                                 ph.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { text, "" + i });
                             } else {
                                 ph.setAttribute("id", "" + tag++);
                             }
@@ -235,10 +231,9 @@ public class Xliff2xProcessor {
                             ph.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { text, "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(e.toString());
+                            int i = consumeTag(e.toString());
                             if (i != -1) {
                                 ph.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { text, "" + i });
                             } else {
                                 ph.setAttribute("id", "" + tag++);
                             }
@@ -253,10 +248,9 @@ public class Xliff2xProcessor {
                             ph.setAttribute("id", "" + tag++);
                             sourcetags.add(new String[] { text, "" + (tag - 1) });
                         } else {
-                            int i = findFirstTag(e.toString());
+                            int i = consumeTag(e.toString());
                             if (i != -1) {
                                 ph.setAttribute("id", "" + i);
-                                sourcetags.remove(new String[] { text, "" + i });
                             } else {
                                 ph.setAttribute("id", "" + tag++);
                             }
@@ -289,9 +283,11 @@ public class Xliff2xProcessor {
         return result;
     }
 
-    private static int findFirstTag(String text) {
-        for (String[] pair : sourcetags) {
+    private static int consumeTag(String text) {
+        for (int i = 0; i < sourcetags.size(); i++) {
+            String[] pair = sourcetags.get(i);
             if (pair[0].equals(text)) {
+                sourcetags.remove(i);
                 return Integer.parseInt(pair[1]);
             }
         }

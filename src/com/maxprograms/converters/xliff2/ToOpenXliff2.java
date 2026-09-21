@@ -48,6 +48,8 @@ public class ToOpenXliff2 {
     int unitCounter = 1;
     int tagCounter = 1;
     String targetVersion = "";
+    private List<String[]> sourceTags = new Vector<>();
+    private boolean inSource = true;
 
     private ToOpenXliff2() {
         usesMatches = false;
@@ -283,6 +285,13 @@ public class ToOpenXliff2 {
             this.usesGlossary = true;
         }
 
+        Element metadata = sourceUnit.getChild("mda:metadata");
+        Element metadataCopy = null;
+        if (metadata != null) {
+            metadataCopy = new Element("mda:metadata");
+            metadataCopy.clone(metadata);
+        }
+
         Set<String> referencedNoteIds = collectReferencedNoteIds(sourceUnit);
         Set<String> segmentIds = ConcurrentHashMap.newKeySet();
         for (Element child : sourceUnit.getChildren("segment")) {
@@ -312,6 +321,9 @@ public class ToOpenXliff2 {
         if (glossaryCopy != null) {
             outputUnit.addContent(glossaryCopy);
         }
+        if (metadataCopy != null) {
+            outputUnit.addContent(metadataCopy);
+        }
         if (notesCopy != null) {
             outputUnit.addContent(notesCopy);
         }
@@ -338,6 +350,10 @@ public class ToOpenXliff2 {
         for (Element child : sourceSegment.getChildren()) {
             String name = child.getName();
             if ("source".equals(name) || "target".equals(name)) {
+                inSource = "source".equals(name);
+                if (inSource) {
+                    sourceTags.clear();
+                }
                 List<XMLNode> normalized = normalizeContent(child.getContent(), originalData);
                 if ("target".equals(name) && normalized.isEmpty()) {
                     continue;
@@ -379,42 +395,50 @@ public class ToOpenXliff2 {
 
     private List<XMLNode> normalizePc(Element e, Element originalData) {
         List<XMLNode> result = new Vector<>();
-
-        String openId = e.getName() + tagCounter++;
-        Element openData = new Element("data");
-        openData.setAttribute("id", openId);
-        openData.setText(XliffUtils.getHead(e));
-        originalData.addContent(openData);
+        String head = XliffUtils.getHead(e);
 
         Element openPh = new Element("ph");
-        openPh.setAttribute("id", openId);
+        openPh.setAttribute("id", getTagId(e.getName(), head, originalData));
         result.add(openPh);
 
         result.addAll(normalizeContent(e.getContent(), originalData));
 
-        String closeId = e.getName() + tagCounter++;
-        Element closeData = new Element("data");
-        closeData.setAttribute("id", closeId);
-        closeData.setText("</" + e.getName() + ">");
-        originalData.addContent(closeData);
-
         Element closePh = new Element("ph");
-        closePh.setAttribute("id", closeId);
+        closePh.setAttribute("id", getTagId(e.getName(), head + "</" + e.getName() + ">",
+                "</" + e.getName() + ">", originalData));
         result.add(closePh);
-
         return result;
     }
 
     private Element normalizeTag(Element e, Element originalData) {
-        String id = e.getName() + tagCounter++;
+        Element ph = new Element("ph");
+        ph.setAttribute("id", getTagId(e.getName(), e.toString(), originalData));
+        return ph;
+    }
+
+    private String getTagId(String prefix, String raw, Element originalData) {
+        return getTagId(prefix, raw, raw, originalData);
+    }
+
+    private String getTagId(String prefix, String key, String raw, Element originalData) {
+        if (!inSource) {
+            for (int i = 0; i < sourceTags.size(); i++) {
+                String[] pair = sourceTags.get(i);
+                if (pair[0].equals(key)) {
+                    sourceTags.remove(i);
+                    return pair[1];
+                }
+            }
+        }
+        String id = prefix + tagCounter++;
         Element data = new Element("data");
         data.setAttribute("id", id);
-        data.setText(e.toString());
+        data.setText(raw);
         originalData.addContent(data);
-
-        Element ph = new Element("ph");
-        ph.setAttribute("id", id);
-        return ph;
+        if (inSource) {
+            sourceTags.add(new String[] { key, id });
+        }
+        return id;
     }
 
     private Set<String> collectReferencedNoteIds(Element element) {
