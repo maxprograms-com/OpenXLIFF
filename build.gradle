@@ -1,5 +1,13 @@
 plugins {
     id 'java'
+    id 'eclipse'
+}
+
+// Put lib JARs on the module path in the IDE; JDT ignores inferModulePath for file dependencies.
+eclipse.classpath.file.whenMerged {
+    entries.findAll { it.kind == 'lib' }.each {
+        it.entryAttributes['module'] = 'true'
+    }
 }
 
 // Disable all caching to ensure clean builds
